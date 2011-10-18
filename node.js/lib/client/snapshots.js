@@ -31,7 +31,7 @@ util.inherits(Snapshots, Client);
 //
 Snapshots.prototype.list = function (name, callback) {
   winston.info('Listing snapshots for ' + name.magenta);
-  var username = this.options.get('username');
+  var username = this.options.username;
   this.request('GET', ['apps', username, name, 'snapshots'], callback, function (res, result) {
     callback(null, result.snapshots);
   });
@@ -46,7 +46,7 @@ Snapshots.prototype.list = function (name, callback) {
 // the `*.tgz` package data in `snapshot`. 
 //
 Snapshots.prototype.create = function (appName, snapshotName, filename, callback) {
-  var username = this.options.get('username');
+  var username = this.options.username;
   var url = ['apps', username, appName, 'snapshots', snapshotName];
   var that = this;
 

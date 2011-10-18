@@ -36,7 +36,7 @@ Logs.prototype.byApp = function (appId, amount, callback) {
     rows: amount
   };
 
-  this.request('POST', ['logs', this.options.get('username') , appId], options, callback, function (res, result) {
+  this.request('POST', ['logs', this.options.username , appId], options, callback, function (res, result) {
     callback(null, result);
   });
 };
@@ -54,7 +54,7 @@ Logs.prototype.byUser = function (amount, callback) {
     rows: amount
   };
 
-  this.request('POST', ['logs', this.options.get('username')], options, callback, function (res, result) {
+  this.request('POST', ['logs', this.options.username], options, callback, function (res, result) {
     callback(null, result);
   });
 };
