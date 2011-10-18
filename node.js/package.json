@@ -1,0 +1,17 @@
+{
+    "name": "nodejitsu-api",
+    "version": "0.1.0",
+    "description": "nodejitsu API client wrapper",
+    "homepage": "http://github.com/nodejitsu/nodejitsu-api",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/nodejitsu/nodejitsu-api.git"
+    },
+    "main": "./lib/client.js",
+    "dependencies": {
+        "eyes": "0.1.x",
+        "request": "1.9.x",
+        "winston": "0.3.x"
+    },
+    "author": "Nodejitsu <info@nodejitsu.com>"
+}
