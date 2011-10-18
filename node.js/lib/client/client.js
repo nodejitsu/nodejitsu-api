@@ -30,19 +30,19 @@ var Client = exports.Client = function (options) {
 // #### @success {function} Continuation to call upon successful transactions
 // Makes a request to `this.remoteUri + uri` using `method` and any 
 // `body` (JSON-only) if supplied. Short circuits to `callback` if the response
-// code from Nodejitsu matches `jitsu.failCodes`. 
+// code from Nodejitsu matches `failCodes`. 
 //
 Client.prototype.request = function (method, uri /* variable arguments */) {
   var options, args = Array.prototype.slice.call(arguments),
       success = args.pop(),
       callback = args.pop(),
       body = typeof args[args.length - 1] === 'object' && !Array.isArray(args[args.length - 1]) && args.pop(),
-      encoded = jitsu.utils.base64.encode(this.options.get('username') + ':' + this.options.get('password')),
-      proxy = this.options.get('proxy');
-  
+      encoded = new Buffer(this.options.username + ':' + this.options.password).toString('base64'),
+      proxy = this.proxy;
+
   options = {
     method: method || 'GET',
-    uri: this.options.get('remoteUri') + '/' + uri.join('/'),
+    uri: this.options.remoteUri + '/' + uri.join('/'),
     headers: {
       'Authorization': 'Basic ' + encoded,
       'Content-Type': 'application/json'
@@ -83,8 +83,8 @@ Client.prototype.request = function (method, uri /* variable arguments */) {
       return callback(error);
     }
 
-    if (Object.keys(jitsu.failCodes).indexOf(statusCode) !== -1) {
-      error = new Error('Nodejitsu Error (' + statusCode + '): ' + jitsu.failCodes[statusCode]);
+    if (Object.keys(failCodes).indexOf(statusCode) !== -1) {
+      error = new Error('Nodejitsu Error (' + statusCode + '): ' + failCodes[statusCode]);
       error.statusCode = statusCode;
       error.result = result;
       return callback(error);
@@ -103,21 +103,21 @@ Client.prototype.request = function (method, uri /* variable arguments */) {
 // #### @callback {function} Continuation to call if errors occur.
 // Makes a `POST` request to `this.remoteUri + uri` with the data in `file` 
 // as the request body. Short circuits to `callback` if the response
-// code from Nodejitsu matches `jitsu.failCodes`.
+// code from Nodejitsu matches `failCodes`.
 //
 Client.prototype.upload = function (uri, contentType, file, callback, success) {
   var self = this,
       options, 
       out, 
       encoded,
-      proxy = self.options.get('proxy');
+      proxy = self.options.proxy;
       
-  encoded = jitsu.utils.base64.encode(this.options.get('username') + ':' + this.options.get('password'));
+  encoded = new Buffer(this.options.username + ':' + this.options.password).toString('base64');
   
   fs.readFile(file, function (err, data) {
     options = {
       method: 'POST',
-      uri: self.options.get('remoteUri') + '/' + uri.join('/'),
+      uri: self.options.remoteUri + '/' + uri.join('/'),
       headers: {
         'Authorization': 'Basic ' + encoded,
         'Content-Type': contentType,
@@ -143,8 +143,8 @@ Client.prototype.upload = function (uri, contentType, file, callback, success) {
       catch (ex) {
         // Ignore Errors
       }
-      if (Object.keys(jitsu.failCodes).indexOf(statusCode) !== -1) {
-        error = new Error('Nodejitsu Error (' + statusCode + '): ' + jitsu.failCodes[statusCode]);
+      if (Object.keys(failCodes).indexOf(statusCode) !== -1) {
+        error = new Error('Nodejitsu Error (' + statusCode + '): ' + failCodes[statusCode]);
         error.result = result;
         return callback(error);
       }
@@ -155,3 +155,13 @@ Client.prototype.upload = function (uri, contentType, file, callback, success) {
     fs.createReadStream(file).pipe(out);
   });
 };
+
+var failCodes = {
+  400: 'Bad Request',
+  401: 'Not Authorized',
+  403: 'Forbidden',
+  404: 'Item not found',
+  409: 'Conflict',
+  500: 'Internal Server Error'
+};
+
