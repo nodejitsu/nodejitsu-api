@@ -7,4 +7,4 @@ var client = nj.createClient({
       remoteUri: 'http://localhost:9001'
     });
 
-client.apps.view('badserver', console.log);
+client.snapshots.list('test', console.log);
