@@ -30,7 +30,7 @@ util.inherits(Apps, Client);
 Apps.prototype.list = function (callback) {
   var username = this.options.username;
   this.request('GET', ['apps', username], callback, function (res, result) {
-    callback(null, result.apps);
+    callback(null, result.apps || res.statusCode);
   })
 };
 
@@ -43,7 +43,7 @@ Apps.prototype.list = function (callback) {
 Apps.prototype.create = function (app, callback) {
   var username = this.options.username;
   this.request('POST', ['apps', username, app.name], app, callback, function (res, result) {
-    callback();
+    callback(null, result || res.statusCode);
   })
 };
 
@@ -56,7 +56,7 @@ Apps.prototype.create = function (app, callback) {
 Apps.prototype.view = function (name, callback) {
   var username = this.options.username;
   this.request('GET', ['apps', username, name], callback, function (res, result) {
-    callback(null, result.app);
+    callback(null, result.app || res.statusCode);
   })
 };
 
@@ -70,7 +70,7 @@ Apps.prototype.view = function (name, callback) {
 Apps.prototype.update = function (name, attrs, callback) {
   var username = this.options.username;
   this.request('PUT', ['apps', username, name], attrs, callback, function (res, result) {
-    callback();
+    callback(null, result || res.statusCode);
   });
 };
 
@@ -83,7 +83,7 @@ Apps.prototype.update = function (name, attrs, callback) {
 Apps.prototype.destroy = function (name, callback) {
   var username = this.options.username;
   this.request('DELETE', ['apps', username, name], callback, function (res, result) {
-    callback();
+    callback(null, result || res.statusCode);
   })
 };
 
@@ -96,7 +96,7 @@ Apps.prototype.destroy = function (name, callback) {
 Apps.prototype.start = function (name, callback) {
   var username = this.options.username;
   this.request('POST', ['apps', username, name, 'start'], callback, function (res, result) {
-    callback();
+    callback(null, result || res.statusCode);
   });
 };
 
@@ -109,7 +109,7 @@ Apps.prototype.start = function (name, callback) {
 Apps.prototype.restart = function (name, callback) {
   var username = this.options.username;
   this.request('POST', ['apps', username, name, 'restart'], callback, function (res, result) {
-    callback();
+    callback(null, result || res.statusCode);
   });
 };
 
@@ -122,7 +122,7 @@ Apps.prototype.restart = function (name, callback) {
 Apps.prototype.stop = function (name, callback) {
   var username = this.options.username;
   this.request('POST', ['apps', username, name, 'stop'], callback, function (res, result) {
-    callback();
+    callback(null, result || res.statusCode);
   });
 };
 
@@ -136,6 +136,6 @@ Apps.prototype.stop = function (name, callback) {
 Apps.prototype.available = function (app, callback) {
   var username = this.options.username;
   this.request('POST', ['apps', username, app.name, 'available'], app, callback, function (res, result) {
-    callback(null, result);
+    callback(null, result || res.statusCode);
   });
 };

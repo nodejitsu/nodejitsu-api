@@ -61,7 +61,7 @@ Snapshots.prototype.create = function (appName, snapshotName, filename, callback
     }
 
     that.upload(url, 'application/octet-stream', filename, callback, function (res, body) {
-      callback(null);
+      callback(null, body || res.statusCode);
     });
   });
 };
@@ -74,11 +74,11 @@ Snapshots.prototype.create = function (appName, snapshotName, filename, callback
 // `snapshot.id === snapshotName`.
 //
 Snapshots.prototype.destroy = function (appName, snapshotName, callback) {
-  var username = jitsu.config.get('username'),
+  var username = this.options.username,
       url = ['apps', username, appName, 'snapshots', snapshotName];
       
   this.request('DELETE', url, callback, function (res, body) {
-    callback();
+    callback(null, body || res.statusCode);
   });
 };
 
@@ -91,10 +91,10 @@ Snapshots.prototype.destroy = function (appName, snapshotName, callback) {
 // `snapshot.id === snapshotName`.
 //
 Snapshots.prototype.activate = function (appName, snapshotName, callback) {
-  var username = jitsu.config.get('username'),
+  var username = this.options.username,
       url = ['apps', username, appName, 'snapshots', snapshotName, 'activate'];
       
   this.request('POST', url, callback, function (res, body) {
-    callback();
+    callback(null, body || res.statusCode);
   });
 };
