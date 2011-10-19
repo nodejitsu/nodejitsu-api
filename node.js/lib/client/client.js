@@ -59,7 +59,7 @@ Client.prototype.request = function (method, uri /* variable arguments */) {
   if (proxy) {
     options.proxy = proxy;
   }
-  
+
   this._request(options, function (err, response, body) {
     if (err) {
       return callback(err);

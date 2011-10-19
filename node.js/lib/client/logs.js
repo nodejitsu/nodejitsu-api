@@ -16,7 +16,7 @@ var util = require('util'),
 // with Nodejitsu's Logs API
 //
 var Logs = exports.Logs = function (options) {
-  Client = require('./client').Client;Client.call(this, options);
+  Client.call(this, options);
 };
 
 // Inherit from Client base object

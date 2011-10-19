@@ -17,7 +17,7 @@ var util = require('util'),
 // with Nodejitsu's Snapshots API
 //
 var Snapshots = exports.Snapshots = function (options) {
-  Client = require('./client').Client;Client.call(this, options);
+  Client.call(this, options);
 };
 
 // Inherit from Client base object
