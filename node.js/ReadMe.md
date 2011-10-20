@@ -4,6 +4,7 @@ The Node.JS Nodejitsu-api library enables accessing Nodejitsu's [RESTful API](ht
 
 ## Example:
 
+```js
     var nj = require('nodejitsu-client'),
         fs = require('fs');
 
@@ -20,6 +21,7 @@ The Node.JS Nodejitsu-api library enables accessing Nodejitsu's [RESTful API](ht
       }
       console.log(JSON.stringify(result, null, 2, true));
     });
+```
 
 ## Install:
 
@@ -34,11 +36,13 @@ This library may be installed using npm:
 
 This method sets up a client for connecting to Nodejitsu's databases. Here's a minimal example for connecting to Nodejitsu's API as Marak:
 
+``` ja
     var client = nj.createClient({
           username: 'marak',
           password: 'foobar',
           remoteUri: 'http://api.nodejitsu.com'
         });
+```
 
 The options object contains three required properties:
 
@@ -51,6 +55,7 @@ The options object contains three required properties:
 
 Method calls look generally the same:
 
+``` js
     client.resource.action("data", function (err, result) {
       if (err) {
         throw err;
@@ -59,6 +64,7 @@ Method calls look generally the same:
       // use the result
 
     });
+```
 
 Most actions take a string argument and a callback, though a few actions only take a callback.
 
