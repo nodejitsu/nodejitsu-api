@@ -9,10 +9,10 @@ var nj = require('nodejitsu-api'),
     fs = require('fs');
 
 var client = nj.createClient({
-      username: 'marak',
-      password: 'foobar',
-      remoteUri: 'http://api.nodejitsu.com'
-    });
+  username: 'marak',
+  password: 'foobar',
+  remoteUri: 'http://api.nodejitsu.com'
+});
 
 client.apps.list(function(err, result){
   if (err) {
