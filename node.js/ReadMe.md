@@ -5,22 +5,22 @@ The Node.JS Nodejitsu-api library enables accessing Nodejitsu's [RESTful API](ht
 ## Example:
 
 ```js
-    var nj = require('nodejitsu-client'),
-        fs = require('fs');
+var nj = require('nodejitsu-client'),
+    fs = require('fs');
 
-    var client = nj.createClient({
-          username: 'marak',
-          password: 'foobar',
-          remoteUri: 'http://api.nodejitsu.com'
-        });
-
-    client.apps.list(function(err, result){
-      if (err) {
-        console.log(err);
-        return;
-      }
-      console.log(JSON.stringify(result, null, 2, true));
+var client = nj.createClient({
+      username: 'marak',
+      password: 'foobar',
+      remoteUri: 'http://api.nodejitsu.com'
     });
+
+client.apps.list(function(err, result){
+  if (err) {
+    console.log(err);
+    return;
+  }
+  console.log(JSON.stringify(result, null, 2, true));
+});
 ```
 
 ## Install:
@@ -36,12 +36,12 @@ This library may be installed using npm:
 
 This method sets up a client for connecting to Nodejitsu's databases. Here's a minimal example for connecting to Nodejitsu's API as Marak:
 
-``` ja
-    var client = nj.createClient({
-          username: 'marak',
-          password: 'foobar',
-          remoteUri: 'http://api.nodejitsu.com'
-        });
+``` js
+var client = nj.createClient({
+  username: 'marak',
+  password: 'foobar',
+  remoteUri: 'http://api.nodejitsu.com'
+});
 ```
 
 The options object contains three required properties:
@@ -53,17 +53,17 @@ The options object contains three required properties:
 
 ### client
 
-Method calls look generally the same:
+Method calls are generally structured as `resource` and `action`.
 
 ``` js
-    client.resource.action("data", function (err, result) {
-      if (err) {
-        throw err;
-      }
+client.resource.action("data", function (err, result) {
+  if (err) {
+    throw err;
+  }
 
-      // use the result
+  // use the result
 
-    });
+});
 ```
 
 Most actions take a string argument and a callback, though a few actions only take a callback.

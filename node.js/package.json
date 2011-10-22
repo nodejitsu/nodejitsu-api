@@ -9,9 +9,9 @@
     },
     "main": "./lib/client.js",
     "dependencies": {
-        "eyes": "0.1.x",
-        "request": "1.9.x",
-        "winston": "0.5.x"
+      "eyes": "0.1.x",
+      "request": "1.9.x",
+      "winston": "0.5.x"
     },
     "author": "Nodejitsu <info@nodejitsu.com>"
 }
