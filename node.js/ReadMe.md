@@ -5,7 +5,7 @@ The Node.JS Nodejitsu-api library enables accessing Nodejitsu's [RESTful API](ht
 ## Example:
 
 ```js
-var nj = require('nodejitsu-client'),
+var nj = require('nodejitsu-api'),
     fs = require('fs');
 
 var client = nj.createClient({
