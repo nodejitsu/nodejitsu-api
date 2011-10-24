@@ -19,6 +19,13 @@ var eyes = require('eyes'),
 var Client = exports.Client = function (options) {
   this.options = options;
   this._request = request;
+
+  if (typeof this.options.get !== 'function') {
+    this.options.get = function (key) {
+      return this[key];
+    }
+  }
+
 };
 
 //
@@ -37,12 +44,12 @@ Client.prototype.request = function (method, uri /* variable arguments */) {
       success = args.pop(),
       callback = args.pop(),
       body = typeof args[args.length - 1] === 'object' && !Array.isArray(args[args.length - 1]) && args.pop(),
-      encoded = new Buffer(this.options.username + ':' + this.options.password).toString('base64'),
+      encoded = new Buffer(this.options.get('username') + ':' + this.options.get('password')).toString('base64'),
       proxy = this.proxy;
 
   options = {
     method: method || 'GET',
-    uri: this.options.remoteUri + '/' + uri.join('/'),
+    uri: this.options.get('remoteUri') + '/' + uri.join('/'),
     headers: {
       'Authorization': 'Basic ' + encoded,
       'Content-Type': 'application/json'
@@ -112,7 +119,7 @@ Client.prototype.upload = function (uri, contentType, file, callback, success) {
       encoded,
       proxy = self.options.proxy;
       
-  encoded = new Buffer(this.options.username + ':' + this.options.password).toString('base64');
+  encoded = new Buffer(this.options.get('username') + ':' + this.options.get('password')).toString('base64');
   
   fs.readFile(file, function (err, data) {
     options = {
