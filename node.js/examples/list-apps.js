@@ -3,8 +3,16 @@ var nj = require('../lib/client'),
 
 var client = nj.createClient({
       username: 'marak',
-      password: '1234',
-      remoteUri: 'http://localhost:9001'
+      password: 'foobar',
+      remoteUri: 'http://api.nodejitsu.com'
     });
 
-client.apps.list(console.log);
+client.apps.list(function(err, result){
+  if (err) {
+    console.log(err);
+    return;
+  }
+  console.log(JSON.stringify(result, null, 2, true));
+});
+
+

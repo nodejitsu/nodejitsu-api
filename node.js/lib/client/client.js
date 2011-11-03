@@ -124,7 +124,7 @@ Client.prototype.upload = function (uri, contentType, file, callback, success) {
   fs.readFile(file, function (err, data) {
     options = {
       method: 'POST',
-      uri: self.options.remoteUri + '/' + uri.join('/'),
+      uri: self.options.get('remoteUri') + '/' + uri.join('/'),
       headers: {
         'Authorization': 'Basic ' + encoded,
         'Content-Type': contentType,

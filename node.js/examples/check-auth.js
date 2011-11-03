@@ -3,12 +3,11 @@ var nj = require('../lib/client'),
 
 var client = nj.createClient({
       username: 'marak',
-      password: 'foobar',
+      password: 'mypassword',
       remoteUri: 'http://api.nodejitsu.com'
     });
 
-
-client.snapshots.list('hellonode', function(err, result){
+client.users.auth(function(err, result){
   if (err) {
     console.log(err);
     return;
