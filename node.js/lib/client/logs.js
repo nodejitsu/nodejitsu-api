@@ -31,7 +31,7 @@ util.inherits(Logs, Client);
 //
 Logs.prototype.byApp = function (appId, amount, callback) {
   var options = {
-    from: 'NOW-3YEARS',
+    from: 'NOW-1DAY',
     until: 'NOW',
     rows: amount
   };
@@ -49,7 +49,7 @@ Logs.prototype.byApp = function (appId, amount, callback) {
 //
 Logs.prototype.byUser = function (amount, callback) {
   var options = {
-    from: 'NOW-3YEARS',
+    from: 'NOW-1DAY',
     until: 'NOW',
     rows: amount
   };
