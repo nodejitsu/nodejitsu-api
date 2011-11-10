@@ -39,11 +39,12 @@ Snapshots.prototype.list = function (name, callback) {
 
 //
 // ### function create (name, snapshot, callback)
-// #### @name {string} Name of the application to create a snapshot for.
-// #### @snapshot {Buffer} Data for the application snapshot (tar+gzip).
+// #### @appName {string} Name of the application to create a snapshot for.
+// #### @snapshotName {string} Snapshot name
+// #### @filename {string} Snapshot filename (`*.tgz` file)
 // #### @callback {function} Continuation to pass control to when complete
-// Creates a snapshot for the application with `app.name = name` using
-// the `*.tgz` package data in `snapshot`. 
+// Creates a snapshot named `snapshotName` for the application with
+// `app.name = name` using the `*.tgz` package data in `filename` file.
 //
 Snapshots.prototype.create = function (appName, snapshotName, filename, callback) {
   var username = this.options.get('username');
