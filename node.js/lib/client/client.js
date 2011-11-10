@@ -117,7 +117,7 @@ Client.prototype.upload = function (uri, contentType, file, callback, success) {
       options, 
       out, 
       encoded,
-      proxy = self.options.proxy;
+      proxy = self.options.get('proxy');
       
   encoded = new Buffer(this.options.get('username') + ':' + this.options.get('password')).toString('base64');
   
