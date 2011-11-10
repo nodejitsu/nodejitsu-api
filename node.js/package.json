@@ -1,6 +1,6 @@
 {
     "name": "nodejitsu-api",
-    "version": "0.1.2-3",
+    "version": "0.1.2-4",
     "description": "nodejitsu API client wrapper",
     "homepage": "http://github.com/nodejitsu/nodejitsu-api",
     "repository": {
