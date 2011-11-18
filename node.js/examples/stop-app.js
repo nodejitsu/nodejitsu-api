@@ -1,5 +1,4 @@
-var nj = require('../lib/client'),
-    fs = require('fs');
+var nj = require('../lib/client');
 
 var client = nj.createClient({
       username: 'marak',
@@ -7,7 +6,7 @@ var client = nj.createClient({
       remoteUri: 'http://api.nodejitsu.com'
     });
 
-client.apps.stop('hellonode', function(err, result){
+client.apps.stop('marak/hellonode', function(err, result){
   if (err) {
     console.log(err);
     return;

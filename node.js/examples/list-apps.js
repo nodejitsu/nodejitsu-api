@@ -7,7 +7,7 @@ var client = nj.createClient({
       remoteUri: 'http://api.nodejitsu.com'
     });
 
-client.apps.list(function(err, result){
+client.apps.list('marak', function(err, result){
   if (err) {
     console.log(err);
     return;

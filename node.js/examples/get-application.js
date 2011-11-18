@@ -8,7 +8,7 @@ var client = nj.createClient({
     });
 
 
-client.apps.view('hellonode', function(err, result){
+client.apps.view('marak/hellonode', function(err, result){
   if (err) {
     console.log(err);
     return;

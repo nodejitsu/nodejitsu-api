@@ -6,7 +6,7 @@ var client = nj.createClient({
       remoteUri: 'http://api.nodejitsu.com'
     });
 
-client.apps.start('marak/hellonode', function(err, result){
+client.apps.restart('marak/hellonode', function(err, result){
   if (err) {
     console.log(err);
     return;

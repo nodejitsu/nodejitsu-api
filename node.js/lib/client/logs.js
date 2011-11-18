@@ -29,14 +29,14 @@ util.inherits(Logs, Client);
 // #### @callback {function} Continuation to pass control to when complete.
 // It retrieves the specified amount of logs for the application
 //
-Logs.prototype.byApp = function (appId, amount, callback) {
+Logs.prototype.byApp = function (name, amount, callback) {
   var options = {
     from: 'NOW-1DAY',
     until: 'NOW',
     rows: amount
   };
 
-  this.request('POST', ['logs', this.options.get('username') , appId], options, callback, function (res, result) {
+  this.request('POST', ['logs', name], options, callback, function (res, result) {
     callback(null, result);
   });
 };
@@ -47,14 +47,14 @@ Logs.prototype.byApp = function (appId, amount, callback) {
 // #### @callback {function} Continuation to pass control to when complete.
 // It retrieves the specified amount of logs for all the applications for the user
 //
-Logs.prototype.byUser = function (amount, callback) {
+Logs.prototype.byUser = function (username, amount, callback) {
   var options = {
     from: 'NOW-1DAY',
     until: 'NOW',
     rows: amount
   };
 
-  this.request('POST', ['logs', this.options.get('username')], options, callback, function (res, result) {
+  this.request('POST', ['logs', username], options, callback, function (res, result) {
     callback(null, result);
   });
 };
