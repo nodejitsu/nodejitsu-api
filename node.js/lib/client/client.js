@@ -168,6 +168,7 @@ var failCodes = {
   401: 'Not Authorized',
   403: 'Forbidden',
   404: 'Item not found',
+  405: 'Method not Allowed',
   409: 'Conflict',
   500: 'Internal Server Error'
 };
