@@ -58,6 +58,18 @@ Users.prototype.available = function (username, callback) {
 };
 
 //
+// ### function view (username, callback)
+// #### @username {string} Username to view data for.
+// #### @callback {function} Continuation to pass control to when complete.
+// Retrieves data for the specified user.
+//
+Users.prototype.view = function (username, callback) {
+  this.request('GET', ['users', username], callback, function (res, result) {
+    callback(null, result);
+  });
+};
+
+//
 // ### function create (user, callback) 
 // #### @user {Object} Properties for the user to confirm.
 // #### @callback {function} Continuation to pass control to when complete
