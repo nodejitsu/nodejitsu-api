@@ -66,8 +66,7 @@ Apps.prototype.view = function (name, callback) {
 // Updates the application with `name` with the specified attributes in `attrs`
 //
 Apps.prototype.update = function (name, attrs, callback) {
-  var username = this.options.get('username');
-  this.request('PUT', ['apps', username, name], attrs, callback, function (res, result) {
+  this.request('PUT', ['apps', name], attrs, callback, function (res, result) {
     callback(null, result || res.statusCode);
   });
 };
