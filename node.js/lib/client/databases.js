@@ -6,7 +6,6 @@
  */
 
 var util = require('util'),
-    winston = require('winston'),
     Client = require('./client').Client;
 
 //
