@@ -5,8 +5,7 @@
  *
  */
 
-var eyes = require('eyes'),
-    fs = require('fs'),
+var fs = require('fs'),
     request = require('request'),
     Client = require('./client').Client;
 
