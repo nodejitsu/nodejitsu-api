@@ -7,7 +7,6 @@
 
 var util = require('util'),
     fs = require('fs'),
-    winston = require('winston'),
     Client = require('./client').Client;
 
 //
@@ -30,7 +29,6 @@ util.inherits(Snapshots, Client);
 // Lists all applications for the authenticated user
 //
 Snapshots.prototype.list = function (name, callback) {
-  winston.info('Listing snapshots for ' + name.magenta);
   var username = this.options.get('username');
   this.request('GET', ['apps', username, name, 'snapshots'], callback, function (res, result) {
     callback(null, result.snapshots);
@@ -49,21 +47,9 @@ Snapshots.prototype.list = function (name, callback) {
 Snapshots.prototype.create = function (appName, snapshotName, filename, callback) {
   var username = this.options.get('username');
   var url = ['apps', username, appName, 'snapshots', snapshotName];
-  var that = this;
 
-  fs.stat(filename, function(err, stat) {
-    if (err) return callback(err);
-
-    // XXX Is 25 mb enough? Please warning message
-    if (stat.size > 50 * 1024 * 1024) {
-      winston.warn('You\'re trying to upload snapshot larger than ' +
-                   '50M'.magenta + '.');
-      winston.warn('This is not recommended practice.');
-    }
-
-    that.upload(url, 'application/octet-stream', filename, callback, function (res, body) {
-      callback(null, body || res.statusCode);
-    });
+  this.upload(url, 'application/octet-stream', filename, callback, function (res, body) {
+    callback(null, body || res.statusCode);
   });
 };
 
