@@ -14,7 +14,7 @@ var client = nj.createClient({
   remoteUri: 'http://api.nodejitsu.com'
 });
 
-client.apps.list('marak', function(err, result){
+client.apps.list(function(err, result){
   if (err) {
     console.log(err);
     return;
@@ -75,6 +75,7 @@ The client's methods are reflective of [jitsu's](https://github.com/nodejitsu/ji
     * `apps.list`
     * `apps.start`
     * `apps.stop`
+    * `apps.destroy`
 * **client.databases**: Manage your databases. Methods include:
     * `databases.create`
     * `databases.destroy`
@@ -92,6 +93,9 @@ The client's methods are reflective of [jitsu's](https://github.com/nodejitsu/ji
     * `users.create`
     * `users.confirm`
     * `users.forgot`
+    * `users.update`
+
+and many more...
 
 ## License
 
