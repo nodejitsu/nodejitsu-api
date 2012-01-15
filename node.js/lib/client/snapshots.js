@@ -22,20 +22,20 @@ var Snapshots = exports.Snapshots = function (options) {
 util.inherits(Snapshots, Client);
 
 //
-// ### function list (name, callback)
-// #### @name {string} Name of the application to list snapshots for.
+// ### function list (appName, callback)
+// #### @appName {string} Name of the application to list snapshots for.
 // #### @callback {function} Continuation to pass control to when complete
 // Lists all applications for the authenticated user
 //
-Snapshots.prototype.list = function (name, callback) {
+Snapshots.prototype.list = function (appName, callback) {
   var username = this.options.get('username');
-  this.request('GET', ['apps', username, name, 'snapshots'], callback, function (res, result) {
+  this.request('GET', ['apps', username, appName, 'snapshots'], callback, function (res, result) {
     callback(null, result.snapshots);
   });
 };
 
 //
-// ### function create (name, snapshot, callback)
+// ### function create (appName, snapshotName, filename, callback)
 // #### @appName {string} Name of the application to create a snapshot for.
 // #### @snapshotName {string} Snapshot name
 // #### @filename {string} Snapshot filename (`*.tgz` file)
@@ -44,8 +44,8 @@ Snapshots.prototype.list = function (name, callback) {
 // `app.name = name` using the `*.tgz` package data in `filename` file.
 //
 Snapshots.prototype.create = function (appName, snapshotName, filename, callback) {
-  var username = this.options.get('username');
-  var url = ['apps', username, appName, 'snapshots', snapshotName];
+  var username = this.options.get('username'),
+      url = ['apps', username, appName, 'snapshots', snapshotName];
 
   this.upload(url, 'application/octet-stream', filename, callback, function (res, body) {
     callback(null, body || res.statusCode);
@@ -53,8 +53,9 @@ Snapshots.prototype.create = function (appName, snapshotName, filename, callback
 };
 
 //
-// ### function create (name, snapshot, callback)
-// #### @name {string} Name of the application to destroy a snapshot for.
+// ### function create (appName, snapshotName, callback)
+// #### @appName {string} Name of the application to destroy a snapshot for.
+// #### @snapshotName {string} Name of the snapshot to destroy.
 // #### @callback {function} Continuation to pass control to when complete
 // Destroys a snapshot for the application with `app.name = name` and 
 // `snapshot.id === snapshotName`.
@@ -69,9 +70,9 @@ Snapshots.prototype.destroy = function (appName, snapshotName, callback) {
 };
 
 //
-// ### function activate (name, snapshot, callback)
-// #### @name {string} Name of the application to activate a snapshot for.
-// #### @snapshot {string} Name of the snapshot to activate.
+// ### function activate (appName, snapshotName, callback)
+// #### @appName {string} Name of the application to activate a snapshot for.
+// #### @snapshotName {string} Name of the snapshot to activate.
 // #### @callback {function} Continuation to pass control to when complete
 // Activates a snapshot for the application with `app.name = name` and 
 // `snapshot.id === snapshotName`.

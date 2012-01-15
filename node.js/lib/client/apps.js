@@ -26,7 +26,8 @@ util.inherits(Apps, Client);
 // #### @callback {function} Continuation to pass control to when complete
 // Lists all applications for the authenticated user
 //
-Apps.prototype.list = function (username, callback) {
+Apps.prototype.list = function (callback) {
+  var username = this.options.get('username');
   this.request('GET', ['apps', username], callback, function (res, result) {
     callback(null, result.apps || res.statusCode);
   })
@@ -46,74 +47,80 @@ Apps.prototype.create = function (app, callback) {
 };
 
 //
-// ### function view (name, callback)
-// #### @name {string} Name of the application to view
+// ### function view (appName, callback)
+// #### @appName {string} Name of the application to view
 // #### @callback {function} Continuation to pass control to when complete
 // Views the application specified by `name`.
 //
-Apps.prototype.view = function (name, callback) {
-  this.request('GET', ['apps', name], callback, function (res, result) {
+Apps.prototype.view = function (appName, callback) {
+  var username = this.options.get('username');
+  this.request('GET', ['apps', username, appName], callback, function (res, result) {
     callback(null, result.app || res.statusCode);
   })
 };
 
 //
 // ### function update (name, attrs, callback)
-// #### @name {string} Name of the application to update
+// #### @appName {string} Name of the application to update
 // #### @attrs {Object} Attributes to update for this application.
 // #### @callback {function} Continuation to pass control to when complete
 // Updates the application with `name` with the specified attributes in `attrs`
 //
-Apps.prototype.update = function (name, attrs, callback) {
-  this.request('PUT', ['apps', name], attrs, callback, function (res, result) {
+Apps.prototype.update = function (appName, attrs, callback) {
+  var username = this.options.get('username');
+  this.request('PUT', ['apps', username, appName], attrs, callback, function (res, result) {
     callback(null, result || res.statusCode);
   });
 };
 
 //
-// ### function destroy (name, callback)
-// #### @name {string} Name of the application to destroy
+// ### function destroy (appName, callback)
+// #### @appName {string} Name of the application to destroy
 // #### @callback {function} Continuation to pass control to when complete
 // Destroys the application with `name` for the authenticated user. 
 //
-Apps.prototype.destroy = function (name, callback) {
-  this.request('DELETE', ['apps', name], callback, function (res, result) {
+Apps.prototype.destroy = function (appName, callback) {
+  var username = this.options.get('username');
+  this.request('DELETE', ['apps', username, appName], callback, function (res, result) {
     callback(null, result || res.statusCode);
   })
 };
 
 //
-// ### function start (name, callback)
-// #### @name {string} Name of the application to start
+// ### function start (appName, callback)
+// #### @appName {string} Name of the application to start
 // #### @callback {function} Continuation to pass control to when complete
 // Starts the application with `name` for the authenticated user. 
 //
-Apps.prototype.start = function (name, callback) {
-  this.request('POST', ['apps', name, 'start'], callback, function (res, result) {
+Apps.prototype.start = function (appName, callback) {
+  var username = this.options.get('username');
+  this.request('POST', ['apps', username, appName, 'start'], callback, function (res, result) {
     callback(null, result || res.statusCode);
   });
 };
 
 //
-// ### function restart (name, callback)
-// #### @name {string} Name of the application to start
+// ### function restart (appName, callback)
+// #### @appName {string} Name of the application to start
 // #### @callback {function} Continuation to pass control to when complete
 // Starts the application with `name` for the authenticated user. 
 //
-Apps.prototype.restart = function (name, callback) {
-  this.request('POST', ['apps', name, 'restart'], callback, function (res, result) {
+Apps.prototype.restart = function (appName, callback) {
+  var username = this.options.get('username');
+  this.request('POST', ['apps', username, appName, 'restart'], callback, function (res, result) {
     callback(null, result || res.statusCode);
   });
 };
 
 //
-// ### function stop (name, callback)
-// #### @name {string} Name of the application to stop.
+// ### function stop (appName, callback)
+// #### @appName {string} Name of the application to stop.
 // #### @callback {function} Continuation to pass control to when complete
 // Stops the application with `name` for the authenticated user. 
 //
-Apps.prototype.stop = function (name, callback) {
-  this.request('POST', ['apps', name, 'stop'], callback, function (res, result) {
+Apps.prototype.stop = function (appName, callback) {
+  var username = this.options.get('username');
+  this.request('POST', ['apps', username, appName, 'stop'], callback, function (res, result) {
     callback(null, result || res.statusCode);
   });
 };

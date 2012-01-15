@@ -22,20 +22,21 @@ var Logs = exports.Logs = function (options) {
 util.inherits(Logs, Client);
 
 //
-// ### function byApp (appId, amount, callback)
-// #### @appId {string} the name of the application to retrieve
+// ### function byApp (appName, amount, callback)
+// #### @appName {string} Name of the application to retrieve
 // #### @amount {number} the number of lines to retrieve
 // #### @callback {function} Continuation to pass control to when complete.
 // It retrieves the specified amount of logs for the application
 //
-Logs.prototype.byApp = function (name, amount, callback) {
+Logs.prototype.byApp = function (appName, amount, callback) {
+  var username = this.options.get('username');
   var options = {
     from: 'NOW-1DAY',
     until: 'NOW',
     rows: amount
   };
 
-  this.request('POST', ['logs', name], options, callback, function (res, result) {
+  this.request('POST', ['logs', username, appName], options, callback, function (res, result) {
     callback(null, result);
   });
 };
@@ -46,7 +47,8 @@ Logs.prototype.byApp = function (name, amount, callback) {
 // #### @callback {function} Continuation to pass control to when complete.
 // It retrieves the specified amount of logs for all the applications for the user
 //
-Logs.prototype.byUser = function (username, amount, callback) {
+Logs.prototype.byUser = function (amount, callback) {
+  var username = this.options.get('username');
   var options = {
     from: 'NOW-1DAY',
     until: 'NOW',
