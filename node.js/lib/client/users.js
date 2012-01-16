@@ -6,7 +6,8 @@
  */
  
 var util = require('util'),
-    Client = require('./client').Client;
+    Client = require('./client').Client,
+    defaultUser = require('./helpers').defaultUser;
     
 //
 // ### function Users (options)
@@ -57,11 +58,12 @@ Users.prototype.available = function (username, callback) {
 };
 
 //
-// ### function view (callback)
+// ### function view (username, callback)
 // #### @callback {function} Continuation to pass control to when complete.
 // Retrieves data for the specified user.
 //
 Users.prototype.view = function (username, callback) {
+
   this.request('GET', ['users', username], callback, function (res, result) {
     callback(null, result);
   });
@@ -81,7 +83,7 @@ Users.prototype.confirm = function (user, callback) {
 
 //
 // ### function forgot (username, callback) 
-// #### @user {Object} username requesting password reset.
+// #### @username {Object} username requesting password reset.
 // #### @params {Object} Object containing shake and new password, if applicable.
 // #### @callback {function} Continuation to pass control to when complete
 // Request an password reset email.
@@ -98,13 +100,14 @@ Users.prototype.forgot = function (username, params, callback) {
 };
 
 //
-// ### function update (object, callback)
+// ### function update (username, object, callback)
+// #### @username {Object} username requesting password reset.
 // #### @object {Object} Updated information about user
 // #### @callback {function} Continuation to pass control to when complete
 // Update user account information.
 //
-Users.prototype.update = function (object, callback) {
-  this.request('PUT', ['users', this.options.get('username')], object, callback, function (res, result) {
+Users.prototype.update = function (username, object, callback) {
+  this.request('PUT', ['users', username], object, callback, function (res, result) {
     callback(null, result);
   });
 }
