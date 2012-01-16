@@ -6,7 +6,8 @@
  */
 
 var util = require('util'),
-    Client = require('./client').Client;
+    Client = require('./client').Client,
+    defaultUser = require('./helpers').defaultUser;
 
 //
 // ### function Apps (options)
@@ -22,13 +23,15 @@ var Apps = exports.Apps = function (options) {
 util.inherits(Apps, Client);
 
 //
-// ### function list (callback)
+// ### function list (appName, callback)
 // #### @callback {function} Continuation to pass control to when complete
 // Lists all applications for the authenticated user
 //
-Apps.prototype.list = function (callback) {
-  var username = this.options.get('username');
-  this.request('GET', ['apps', username], callback, function (res, result) {
+Apps.prototype.list = function (appName, callback) {
+
+  var appName = defaultUser.call(this, appName);
+
+  this.request('GET', ['apps', appName], callback, function (res, result) {
     callback(null, result.apps || res.statusCode);
   })
 };
@@ -40,7 +43,7 @@ Apps.prototype.list = function (callback) {
 // Creates an application with the specified package.json manifest in `app`. 
 //
 Apps.prototype.create = function (app, callback) {
-  var username = this.options.get('username');
+
   this.request('POST', ['apps', username, app.name], app, callback, function (res, result) {
     callback(null, result || res.statusCode);
   })
@@ -53,8 +56,10 @@ Apps.prototype.create = function (app, callback) {
 // Views the application specified by `name`.
 //
 Apps.prototype.view = function (appName, callback) {
-  var username = this.options.get('username');
-  this.request('GET', ['apps', username, appName], callback, function (res, result) {
+  var appName = defaultUser.call(this, appName),
+      argv = ['apps'].concat(appName.split('/'));
+
+  this.request('GET', argv), callback, function (res, result) {
     callback(null, result.app || res.statusCode);
   })
 };
@@ -67,8 +72,10 @@ Apps.prototype.view = function (appName, callback) {
 // Updates the application with `name` with the specified attributes in `attrs`
 //
 Apps.prototype.update = function (appName, attrs, callback) {
-  var username = this.options.get('username');
-  this.request('PUT', ['apps', username, appName], attrs, callback, function (res, result) {
+  var appName = defaultUser.call(this, appName);
+      argv = ['apps'].concat(appName.split('/'));
+
+  this.request('PUT', argv), attrs, callback, function (res, result) {
     callback(null, result || res.statusCode);
   });
 };
@@ -80,8 +87,10 @@ Apps.prototype.update = function (appName, attrs, callback) {
 // Destroys the application with `name` for the authenticated user. 
 //
 Apps.prototype.destroy = function (appName, callback) {
-  var username = this.options.get('username');
-  this.request('DELETE', ['apps', username, appName], callback, function (res, result) {
+  var appName = defaultUser.call(this, appName),
+      argv = ['apps'].concat(appName.split('/'));
+
+  this.request('DELETE', argv, callback, function (res, result) {
     callback(null, result || res.statusCode);
   })
 };
@@ -93,8 +102,10 @@ Apps.prototype.destroy = function (appName, callback) {
 // Starts the application with `name` for the authenticated user. 
 //
 Apps.prototype.start = function (appName, callback) {
-  var username = this.options.get('username');
-  this.request('POST', ['apps', username, appName, 'start'], callback, function (res, result) {
+  var appName = defaultUser.call(this, appName),
+      argv = ['apps'].concat(appName.split('/')).concat('start');
+
+  this.request('POST', argv, callback, function (res, result) {
     callback(null, result || res.statusCode);
   });
 };
@@ -106,8 +117,10 @@ Apps.prototype.start = function (appName, callback) {
 // Starts the application with `name` for the authenticated user. 
 //
 Apps.prototype.restart = function (appName, callback) {
-  var username = this.options.get('username');
-  this.request('POST', ['apps', username, appName, 'restart'], callback, function (res, result) {
+  var appName = defaultUser.call(this, appName),
+      argv = ['apps'].concat(appName.split('/')).concat('restart');
+
+  this.request('POST', argv, callback, function (res, result) {
     callback(null, result || res.statusCode);
   });
 };
@@ -119,8 +132,10 @@ Apps.prototype.restart = function (appName, callback) {
 // Stops the application with `name` for the authenticated user. 
 //
 Apps.prototype.stop = function (appName, callback) {
-  var username = this.options.get('username');
-  this.request('POST', ['apps', username, appName, 'stop'], callback, function (res, result) {
+  var appName = defaultUser.call(this, appName),
+      argv = ['apps'].concat(appName.split('/')).concat('stop');
+
+  this.request('POST', argv, callback, function (res, result) {
     callback(null, result || res.statusCode);
   });
 };
@@ -133,8 +148,10 @@ Apps.prototype.stop = function (appName, callback) {
 // in the current Nodejitsu environment.
 //
 Apps.prototype.available = function (app, callback) {
-  var username = this.options.get('username');
-  this.request('POST', ['apps', username, app.name, 'available'], app, callback, function (res, result) {
+  var appName = defaultUser.call(this, appName),
+      argv = ['apps'].concat(appName.split('/')).concat('available');
+
+  this.request('POST', argv, app, callback, function (res, result) {
     callback(null, result || res.statusCode);
   });
 };
