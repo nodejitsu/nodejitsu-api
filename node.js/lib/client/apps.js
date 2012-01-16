@@ -23,15 +23,18 @@ var Apps = exports.Apps = function (options) {
 util.inherits(Apps, Client);
 
 //
-// ### function list (appName, callback)
+// ### function list (username, callback)
 // #### @callback {function} Continuation to pass control to when complete
 // Lists all applications for the authenticated user
 //
-Apps.prototype.list = function (appName, callback) {
+Apps.prototype.list = function (username, callback) {
 
-  var appName = defaultUser.call(this, appName);
+  if (arguments.length == 1) {
+    callback = username;
+    username = this.options.get('username');
+  }
 
-  this.request('GET', ['apps', appName], callback, function (res, result) {
+  this.request('GET', ['apps', username], callback, function (res, result) {
     callback(null, result.apps || res.statusCode);
   })
 };
