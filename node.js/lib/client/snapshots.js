@@ -88,7 +88,7 @@ Snapshots.prototype.activate = function (appName, snapshotName, callback) {
   var appName = defaultUser.call(this, appName),
       argv = ['apps']
         .concat(appName.split('/'))
-        .concat(['snapshots', snapshotName, 'activate'];
+        .concat(['snapshots', snapshotName, 'activate']);
       
   this.request('POST', argv, callback, function (res, body) {
     callback(null, body || res.statusCode);
