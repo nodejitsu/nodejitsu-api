@@ -62,7 +62,7 @@ Apps.prototype.view = function (appName, callback) {
   var appName = defaultUser.call(this, appName),
       argv = ['apps'].concat(appName.split('/'));
 
-  this.request('GET', argv), callback, function (res, result) {
+  this.request('GET', argv, callback, function (res, result) {
     callback(null, result.app || res.statusCode);
   })
 };
@@ -78,7 +78,7 @@ Apps.prototype.update = function (appName, attrs, callback) {
   var appName = defaultUser.call(this, appName);
       argv = ['apps'].concat(appName.split('/'));
 
-  this.request('PUT', argv), attrs, callback, function (res, result) {
+  this.request('PUT', argv, attrs, callback, function (res, result) {
     callback(null, result || res.statusCode);
   });
 };
