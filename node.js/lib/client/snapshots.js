@@ -6,7 +6,8 @@
  */
 
 var util = require('util'),
-    Client = require('./client').Client;
+    Client = require('./client').Client,
+    defaultUser = require('./helpers').defaultUser;
 
 //
 // ### function Snapshots (options)
@@ -28,8 +29,10 @@ util.inherits(Snapshots, Client);
 // Lists all applications for the authenticated user
 //
 Snapshots.prototype.list = function (appName, callback) {
-  var username = this.options.get('username');
-  this.request('GET', ['apps', username, appName, 'snapshots'], callback, function (res, result) {
+  var username = defaultUser.call(this, appName),
+      argv = ['apps'].concat(username.split('/')).concat('snapshots');
+
+  this.request('GET', argv, callback, function (res, result) {
     callback(null, result.snapshots);
   });
 };
@@ -44,8 +47,10 @@ Snapshots.prototype.list = function (appName, callback) {
 // `app.name = name` using the `*.tgz` package data in `filename` file.
 //
 Snapshots.prototype.create = function (appName, snapshotName, filename, callback) {
-  var username = this.options.get('username'),
-      url = ['apps', username, appName, 'snapshots', snapshotName];
+  var appName = defaultUser.call(this, appName),
+      argv = ['apps']
+        .concat(appName.split('/'))
+        .concat(['snapshots', snapshotName]);
 
   this.upload(url, 'application/octet-stream', filename, callback, function (res, body) {
     callback(null, body || res.statusCode);
@@ -61,10 +66,12 @@ Snapshots.prototype.create = function (appName, snapshotName, filename, callback
 // `snapshot.id === snapshotName`.
 //
 Snapshots.prototype.destroy = function (appName, snapshotName, callback) {
-  var username = this.options.get('username'),
-      url = ['apps', username, appName, 'snapshots', snapshotName];
+  var appName = defaultUser.call(this, appName),
+      argv = ['apps']
+        .concat(appName.split('/'))
+        .concat(['snapshots', snapshotName]);
       
-  this.request('DELETE', url, callback, function (res, body) {
+  this.request('DELETE', argv, callback, function (res, body) {
     callback(null, body || res.statusCode);
   });
 };
@@ -78,10 +85,12 @@ Snapshots.prototype.destroy = function (appName, snapshotName, callback) {
 // `snapshot.id === snapshotName`.
 //
 Snapshots.prototype.activate = function (appName, snapshotName, callback) {
-  var username = this.options.get('username'),
-      url = ['apps', username, appName, 'snapshots', snapshotName, 'activate'];
+  var appName = defaultUser.call(this, appName),
+      argv = ['apps']
+        .concat(appName.split('/'))
+        .concat(['snapshots', snapshotName, 'activate'];
       
-  this.request('POST', url, callback, function (res, body) {
+  this.request('POST', argv, callback, function (res, body) {
     callback(null, body || res.statusCode);
   });
 };
