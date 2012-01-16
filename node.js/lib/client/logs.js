@@ -6,7 +6,8 @@
  */
 
 var util = require('util'),
-    Client = require('./client').Client;
+    Client = require('./client').Client,
+    defaultUser = require('./helpers').defaultUser;
 
 //
 // ### function Logs (options)
@@ -29,27 +30,42 @@ util.inherits(Logs, Client);
 // It retrieves the specified amount of logs for the application
 //
 Logs.prototype.byApp = function (appName, amount, callback) {
-  var username = this.options.get('username');
-  var options = {
-    from: 'NOW-1DAY',
-    until: 'NOW',
-    rows: amount
-  };
+  var appName = defaultUser.call(this, appName),
+      argv = ['logs'].concat(appName.split('/')),
+      options = {
+        from: 'NOW-1DAY',
+        until: 'NOW',
+        rows: amount
+      };
 
-  this.request('POST', ['logs', username, appName], options, callback, function (res, result) {
+  this.request('POST', argv, options, callback, function (res, result) {
     callback(null, result);
   });
 };
 
 //
 // ### function byUser (amount, callback)
+// #### @username {string} Name of user whose logs we wish to retrieve
 // #### @amount {number} the number of lines to retrieve
 // #### @callback {function} Continuation to pass control to when complete.
 // It retrieves the specified amount of logs for all the applications for the user
 //
-Logs.prototype.byUser = function (amount, callback) {
-  var username = this.options.get('username');
-  var options = {
+Logs.prototype.byUser = function (username, amount, callback) {
+  var options;
+
+
+  if (arguments.length == 2) {
+    callback = amount;
+    amount = username;
+    username = this.options.get('username');
+
+  }
+
+  if (typeof username === undefined || username === null) {
+    username = this.options.get('username');
+  }
+
+  options = {
     from: 'NOW-1DAY',
     until: 'NOW',
     rows: amount
