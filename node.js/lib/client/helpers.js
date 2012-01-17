@@ -7,7 +7,7 @@
 //
 exports.defaultUser = function (appName) {
   if (appName.search('/') === -1) {
-    appName = this.options.get('username') + '/' + name;
+    appName = this.options.get('username') + '/' + appName;
   }
 
   return appName;
