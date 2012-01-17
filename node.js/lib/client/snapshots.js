@@ -52,7 +52,7 @@ Snapshots.prototype.create = function (appName, snapshotName, filename, callback
         .concat(appName.split('/'))
         .concat(['snapshots', snapshotName]);
 
-  this.upload(url, 'application/octet-stream', filename, callback, function (res, body) {
+  this.upload(argv, 'application/octet-stream', filename, callback, function (res, body) {
     callback(null, body || res.statusCode);
   });
 };
