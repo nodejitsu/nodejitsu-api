@@ -46,6 +46,7 @@ Apps.prototype.list = function (username, callback) {
 // Creates an application with the specified package.json manifest in `app`. 
 //
 Apps.prototype.create = function (app, callback) {
+  var username = this.options.get('username');
 
   this.request('POST', ['apps', username, app.name], app, callback, function (res, result) {
     callback(null, result || res.statusCode);
@@ -151,7 +152,7 @@ Apps.prototype.stop = function (appName, callback) {
 // in the current Nodejitsu environment.
 //
 Apps.prototype.available = function (app, callback) {
-  var appName = defaultUser.call(this, appName),
+  var appName = defaultUser.call(this, app.name),
       argv = ['apps'].concat(appName.split('/')).concat('available');
 
   this.request('POST', argv, app, callback, function (res, result) {
