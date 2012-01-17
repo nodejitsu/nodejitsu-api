@@ -46,9 +46,9 @@ Apps.prototype.list = function (username, callback) {
 // Creates an application with the specified package.json manifest in `app`. 
 //
 Apps.prototype.create = function (app, callback) {
-  var username = this.options.get('username');
+  var appName = defaultUser.call(this, app.name);
 
-  this.request('POST', ['apps', username, app.name], app, callback, function (res, result) {
+  this.request('POST', ['apps', appName], app, callback, function (res, result) {
     callback(null, result || res.statusCode);
   })
 };
