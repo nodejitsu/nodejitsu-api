@@ -113,14 +113,18 @@ Client.prototype.request = function (method, uri /* variable arguments */) {
 //
 Client.prototype.upload = function (uri, contentType, file, callback, success) {
   var self = this,
-      options, 
-      out, 
+      options,
+      out,
       encoded,
       proxy = self.options.get('proxy');
-      
+
   encoded = new Buffer(this.options.get('username') + ':' + this.options.get('password')).toString('base64');
-  
+
   fs.readFile(file, function (err, data) {
+    if (err) {
+      return callback(err);
+    }
+
     options = {
       method: 'POST',
       uri: self.options.get('remoteUri') + '/' + uri.join('/'),
@@ -130,11 +134,11 @@ Client.prototype.upload = function (uri, contentType, file, callback, success) {
         'Content-Length': data.length
       }
     };
-    
+
     if(proxy) {
       options.proxy = proxy;
     }
-    
+
     out = self._request(options, function (err, response, body) {
       if (err) {
         return callback(err);
