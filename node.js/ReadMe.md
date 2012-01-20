@@ -48,7 +48,7 @@ The options object contains three required properties:
 
 * `username`: The username for your Nodejitsu account
 * `password`: The password for your Nodejitsu account
-* `remoteUri`: The uri of the api host (typically (http://api.nodejitsu.com)[http://api.nodejitsu.com]).
+* `remoteUri`: The uri of the api host (typically [http://api.nodejitsu.com](http://api.nodejitsu.com)).
 
 
 ### client
