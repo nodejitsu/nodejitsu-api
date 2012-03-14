@@ -120,7 +120,7 @@ Client.prototype.upload = function (uri, contentType, file, callback, success) {
 
   encoded = new Buffer(this.options.get('username') + ':' + this.options.get('password')).toString('base64');
 
-  fs.readFile(file, function (err, data) {
+  fs.stat(file, function (err, stat) {
     if (err) {
       return callback(err);
     }
@@ -131,7 +131,7 @@ Client.prototype.upload = function (uri, contentType, file, callback, success) {
       headers: {
         'Authorization': 'Basic ' + encoded,
         'Content-Type': contentType,
-        'Content-Length': data.length
+        'Content-Length': stat.size
       }
     };
 
