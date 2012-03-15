@@ -33,4 +33,22 @@ vows.describe('apps').addBatch(makeApiCall(
         apps: []
       }, { 'x-powered-by': 'Nodejitsu' })
   }
+)).addBatch(makeApiCall(
+  'apps view myApp',
+  function setup () {
+    nock('http://api.mockjitsu.com')
+      .get('/apps/tester/myApp')
+      .reply(200, {
+        apps: []
+      }, { 'x-powered-by': 'Nodejitsu' })
+  }
+)).addBatch(makeApiCall(
+  'apps view myUser/myApp',
+  function setup () {
+    nock('http://api.mockjitsu.com')
+      .get('/apps/myUser/myApp')
+      .reply(200, {
+        apps: []
+      }, { 'x-powered-by': 'Nodejitsu' })
+  }
 )).export(module);
