@@ -23,15 +23,11 @@ vows.describe('apps').addBatch(makeApiCall(
   }
 )).addBatch(makeApiCall(
   'apps create',
-  {
-    name: 'myApp'
-  },
+  { name: 'myApp' },
   function setup () {
     nock('http://api.mockjitsu.com')
       .post('/apps/tester/myApp', { name: 'myApp' })
-      .reply(200, {
-        apps: []
-      }, { 'x-powered-by': 'Nodejitsu' })
+      .reply(200, {}, { 'x-powered-by': 'Nodejitsu' })
   }
 )).addBatch(makeApiCall(
   'apps view myApp',
@@ -39,7 +35,7 @@ vows.describe('apps').addBatch(makeApiCall(
     nock('http://api.mockjitsu.com')
       .get('/apps/tester/myApp')
       .reply(200, {
-        apps: []
+        app: {}
       }, { 'x-powered-by': 'Nodejitsu' })
   }
 )).addBatch(makeApiCall(
@@ -48,7 +44,7 @@ vows.describe('apps').addBatch(makeApiCall(
     nock('http://api.mockjitsu.com')
       .get('/apps/myUser/myApp')
       .reply(200, {
-        apps: []
+        app: {}
       }, { 'x-powered-by': 'Nodejitsu' })
   }
 )).addBatch(makeApiCall(
@@ -57,8 +53,44 @@ vows.describe('apps').addBatch(makeApiCall(
   function setup () {
     nock('http://api.mockjitsu.com')
       .put('/apps/myUser/myApp', { foo: 'bar' })
+      .reply(200, {}, { 'x-powered-by': 'Nodejitsu' })
+  }
+)).addBatch(makeApiCall(
+  'apps destroy myUser/myApp',
+  function setup () {
+    nock('http://api.mockjitsu.com')
+      .destroy('/apps/myUser/myApp')
       .reply(200, {
         apps: []
       }, { 'x-powered-by': 'Nodejitsu' })
+  }
+)).addBatch(makeApiCall(
+  'apps start myApp',
+  function setup () {
+    nock('http://api.mockjitsu.com')
+      .post('/apps/tester/myApp/start', {})
+      .reply(200, {}, { 'x-powered-by': 'Nodejitsu' })
+  }
+)).addBatch(makeApiCall(
+  'apps restart myApp',
+  function setup () {
+    nock('http://api.mockjitsu.com')
+      .post('/apps/tester/myApp/restart', {})
+      .reply(200, {}, { 'x-powered-by': 'Nodejitsu' })
+  }
+)).addBatch(makeApiCall(
+  'apps stop myApp',
+  function setup () {
+    nock('http://api.mockjitsu.com')
+      .post('/apps/tester/myApp/stop', {})
+      .reply(200, {}, { 'x-powered-by': 'Nodejitsu' })
+  }
+)).addBatch(makeApiCall(
+  'apps available',
+  { name: 'myApp' },
+  function setup () {
+    nock('http://api.mockjitsu.com')
+      .post('/apps/tester/myApp/available', { name: 'myApp'})
+      .reply(200, {}, { 'x-powered-by': 'Nodejitsu' })
   }
 )).export(module);
