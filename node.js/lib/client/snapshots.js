@@ -58,7 +58,7 @@ Snapshots.prototype.create = function (appName, snapshotName, filename, callback
 };
 
 //
-// ### function create (appName, snapshotName, callback)
+// ### function destroy (appName, snapshotName, callback)
 // #### @appName {string} Name of the application to destroy a snapshot for.
 // #### @snapshotName {string} Name of the snapshot to destroy.
 // #### @callback {function} Continuation to pass control to when complete
