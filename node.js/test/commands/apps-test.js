@@ -51,4 +51,14 @@ vows.describe('apps').addBatch(makeApiCall(
         apps: []
       }, { 'x-powered-by': 'Nodejitsu' })
   }
+)).addBatch(makeApiCall(
+  'apps update myUser/myApp',
+  { foo: 'bar'},
+  function setup () {
+    nock('http://api.mockjitsu.com')
+      .put('/apps/myUser/myApp', { foo: 'bar' })
+      .reply(200, {
+        apps: []
+      }, { 'x-powered-by': 'Nodejitsu' })
+  }
 )).export(module);
