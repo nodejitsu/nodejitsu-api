@@ -21,7 +21,6 @@ exports.makeApiCall = function () {
       i;
 
 
-  // TODO:
   args.forEach(function (arg) {
     switch (typeof arg) {
       case 'string':
