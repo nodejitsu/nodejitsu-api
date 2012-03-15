@@ -3,13 +3,34 @@ var vows = require('vows'),
     nock = require('nock'),
     makeApiCall = require('../macros').makeApiCall;
 
-nock.recorder.rec();
-
 vows.describe('apps').addBatch(makeApiCall(
-  'apps list tester/differentApp',
+  'apps list',
   function setup () {
     nock('http://api.mockjitsu.com')
-      .get()
-      .reply(200, {})
+      .get('/apps/tester')
+      .reply(200, {
+        apps: []
+      }, { 'x-powered-by': 'Nodejitsu' })
   }
-))
+)).addBatch(makeApiCall(
+  'apps list myUser',
+  function setup () {
+    nock('http://api.mockjitsu.com')
+      .get('/apps/myUser')
+      .reply(200, {
+        apps: []
+      }, { 'x-powered-by': 'Nodejitsu' })
+  }
+)).addBatch(makeApiCall(
+  'apps create',
+  {
+    name: 'myApp'
+  },
+  function setup () {
+    nock('http://api.mockjitsu.com')
+      .post('/apps/tester/myApp', { name: 'myApp' })
+      .reply(200, {
+        apps: []
+      }, { 'x-powered-by': 'Nodejitsu' })
+  }
+)).export(module);
