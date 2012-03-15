@@ -97,6 +97,14 @@ The client's methods are reflective of [jitsu's](https://github.com/nodejitsu/ji
 
 and many more...
 
+## Tests
+
+All tests are written with [vows](http://vowsjs.org) and should be run with [npm](http://npmjs.org):
+
+``` bash
+  $ npm test
+```
+
 ## License
 
 MIT.

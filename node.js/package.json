@@ -8,8 +8,15 @@
         "url": "https://github.com/nodejitsu/nodejitsu-api.git"
     },
     "main": "./lib/client.js",
+    "scripts": {
+      "test": "vows --spec ./test/commands/*-test.js"
+    },
     "dependencies": {
       "request": "2.2.x"
+    },
+    "devDependencies": {
+      "vows": "0.6.x",
+      "nock": "0.10.x"
     },
     "author": "Nodejitsu <info@nodejitsu.com>"
 }
