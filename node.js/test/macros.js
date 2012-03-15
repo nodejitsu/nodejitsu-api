@@ -1,5 +1,5 @@
-var createClient = require('../../lib/client').createClient,
-    client = new createClient({
+var createClient = require('../lib/client').createClient,
+    client = createClient({
       username: 'tester',
       password: 'password',
       remoteUri: 'http://api.mockjitsu.com'
@@ -9,6 +9,7 @@ var createClient = require('../../lib/client').createClient,
 exports.makeApiCall = function () {
   var args = [].slice.call(arguments),
       data,
+      that = {},
       method = client,
       testName,
       assertTxt,
@@ -20,8 +21,6 @@ exports.makeApiCall = function () {
       i;
 
   args.forEach(function (arg) {
-    var method;
-
     switch (typeof arg) {
       case 'string':
         if (!testName) {
@@ -32,8 +31,9 @@ exports.makeApiCall = function () {
           // Attempt to walk the command path in order to find the method the user
           // wants to call, dumping the rest of the arguments into "data".
           // Using .any as a short-circuiting "forEach" substitute.
-          arg.split(' ').any(function (word) {
+          arg.split(' ').some(function (word) {
             if (method[word]) {
+              that = method;
               method = method[word];
               i++;
             }
@@ -42,7 +42,8 @@ exports.makeApiCall = function () {
               return true;
             }
           });
-        } else if (!assertTxt) {
+        }
+        else if (!assertTxt) {
           assertTxt = arg;
         }
         break;
@@ -58,6 +59,9 @@ exports.makeApiCall = function () {
           break;
         }
 
+      case 'object':
+        data = arg;
+        break;
       default:
         throw new Error(
           'The `makeApiCall` macro doesn\'t know how to interpret '
@@ -76,7 +80,16 @@ exports.makeApiCall = function () {
 
     setupFn();
 
-    method.call(client, data, this.callback);
+    if (data) {
+      method.call(that, data, function (err, res) {
+        cb(err, res);
+      });
+    }
+    else {
+      method.call(that, function (err, res) {
+        cb(err, res);
+      });
+    }
   };
 
   context[testName][assertTxt] = assertFn;
