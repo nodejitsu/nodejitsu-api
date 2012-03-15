@@ -39,7 +39,7 @@ exports.makeApiCall = function () {
               i++;
             }
             else {
-              data.push(arg.split(' ').slice(i).join(' '));
+              data = data.concat(arg.split(' ').slice(i));
               return true;
             }
           });
