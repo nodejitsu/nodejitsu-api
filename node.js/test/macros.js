@@ -8,7 +8,7 @@ var createClient = require('../lib/client').createClient,
 
 exports.makeApiCall = function () {
   var args = [].slice.call(arguments),
-      data,
+      data = [],
       that = {},
       method = client,
       testName,
@@ -20,6 +20,8 @@ exports.makeApiCall = function () {
       context = {},
       i;
 
+
+  // TODO:
   args.forEach(function (arg) {
     switch (typeof arg) {
       case 'string':
@@ -38,7 +40,7 @@ exports.makeApiCall = function () {
               i++;
             }
             else {
-              data = arg.split(' ').slice(i).join(' ');
+              data.push(arg.split(' ').slice(i).join(' '));
               return true;
             }
           });
@@ -60,7 +62,7 @@ exports.makeApiCall = function () {
         }
 
       case 'object':
-        data = arg;
+        data.push(arg);
         break;
       default:
         throw new Error(
@@ -80,16 +82,9 @@ exports.makeApiCall = function () {
 
     setupFn();
 
-    if (data) {
-      method.call(that, data, function (err, res) {
-        cb(err, res);
-      });
-    }
-    else {
-      method.call(that, function (err, res) {
-        cb(err, res);
-      });
-    }
+    method.apply(that, data.concat(function (err, res) {
+      cb(err, res);
+    }));
   };
 
   context[testName][assertTxt] = assertFn;
