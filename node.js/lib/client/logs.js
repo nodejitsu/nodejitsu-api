@@ -65,6 +65,8 @@ Logs.prototype.byUser = function (username, amount, callback) {
     username = this.options.get('username');
   }
 
+  username = username.toLowerCase();
+
   options = {
     from: 'NOW-1DAY',
     until: 'NOW',

@@ -34,6 +34,8 @@ Apps.prototype.list = function (username, callback) {
     username = this.options.get('username');
   }
 
+  username = username.toLowerCase();
+
   this.request('GET', ['apps', username], callback, function (res, result) {
     callback(null, result.apps || res.statusCode);
   })
