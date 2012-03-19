@@ -18,7 +18,7 @@ vows.describe('logs').addBatch(makeApiCall(
   'logs byUser myUser 50',
   function setup () {
     nock('http://api.mockjitsu.com')
-      .post('/logs/myUser', {
+      .post('/logs/myuser', {
         from: "NOW-1DAY",
         until: "NOW",
         rows: "50"

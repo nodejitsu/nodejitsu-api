@@ -16,7 +16,7 @@ vows.describe('apps').addBatch(makeApiCall(
   'apps list myUser',
   function setup () {
     nock('http://api.mockjitsu.com')
-      .get('/apps/myUser')
+      .get('/apps/myuser')
       .reply(200, {
         apps: []
       }, { 'x-powered-by': 'Nodejitsu' })
