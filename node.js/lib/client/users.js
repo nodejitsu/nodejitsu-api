@@ -40,7 +40,7 @@ Users.prototype.auth = function (callback) {
 // Creates a new user with the properties specified by `user`.
 //
 Users.prototype.create = function (user, callback) {
-  this.request('POST', ['users', user.username], user, callback, function (res, result) {
+  this.request('POST', ['users', user.username.toLowerCase()], user, callback, function (res, result) {
     callback();
   });
 };
@@ -52,7 +52,7 @@ Users.prototype.create = function (user, callback) {
 // Checks the availability of the specified `username`.
 //
 Users.prototype.available = function (username, callback) {
-  this.request('GET', ['users', username, 'available'], callback, function (res, result) {
+  this.request('GET', ['users', username.toLowerCase(), 'available'], callback, function (res, result) {
     callback(null, result);
   });
 };
@@ -64,7 +64,7 @@ Users.prototype.available = function (username, callback) {
 //
 Users.prototype.view = function (username, callback) {
 
-  this.request('GET', ['users', username], callback, function (res, result) {
+  this.request('GET', ['users', username.toLowerCase()], callback, function (res, result) {
     callback(null, result);
   });
 };
@@ -76,7 +76,7 @@ Users.prototype.view = function (username, callback) {
 // Confirms the specified `user` by sending the invite code in the `user` specified.
 //
 Users.prototype.confirm = function (user, callback) {
-  this.request('POST', ['users', user.username, 'confirm'], user, callback, function (res, result) {
+  this.request('POST', ['users', user.username.toLowerCase(), 'confirm'], user, callback, function (res, result) {
     callback(null, result);
   });
 };
@@ -94,7 +94,7 @@ Users.prototype.forgot = function (username, params, callback) {
     params = {};
   }
 
-  this.request('POST', ['users', username, 'forgot'], params, callback, function (res, result) {
+  this.request('POST', ['users', username.toLowerCase(), 'forgot'], params, callback, function (res, result) {
     return callback(null, result);
   });
 };
@@ -107,7 +107,7 @@ Users.prototype.forgot = function (username, params, callback) {
 // Update user account information.
 //
 Users.prototype.update = function (username, object, callback) {
-  this.request('PUT', ['users', username], object, callback, function (res, result) {
+  this.request('PUT', ['users', username.toLowerCase()], object, callback, function (res, result) {
     callback(null, result);
   });
 }
