@@ -7,6 +7,8 @@
 
 var fs = require('fs'),
     request = require('request'),
+    util = require('util'),
+    EventEmitter = require('events').EventEmitter,
     Client = require('./client').Client;
 
 //
@@ -26,6 +28,8 @@ var Client = exports.Client = function (options) {
   }
 
 };
+
+util.inherits(Client, EventEmitter);
 
 //
 // ### @private function request (method, uri, [body], success, callback)
@@ -66,13 +70,17 @@ Client.prototype.request = function (method, uri /* variable arguments */) {
     options.proxy = proxy;
   }
 
+  var self = this;
+
+  self.emit('debug::request', options);
+
   this._request(options, function (err, response, body) {
     if (err) {
       return callback(err);
     }
-    
+
     var statusCode, result, error;
-    
+
     try {
       statusCode = response.statusCode.toString();
       result = JSON.parse(body);
@@ -80,6 +88,8 @@ Client.prototype.request = function (method, uri /* variable arguments */) {
     catch (ex) {
       // Ignore Errors
     }
+
+    self.emit('debug::response', { statusCode: statusCode, result: result });
 
     var poweredBy = response.headers['x-powered-by'];
     if (!poweredBy || poweredBy.indexOf('Nodejitsu') === -1) {
