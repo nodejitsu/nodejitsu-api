@@ -2,13 +2,12 @@ var nj = require('../lib/client'),
     fs = require('fs');
 
 var client = nj.createClient({
-      username: 'jim',
-      password: '1234',
-      remoteUri: 'http://localhost:9001',
-      debug: true
-    });
+  username: 'marak',
+  password: 'foobar',
+  remoteUri: 'http://api.nodejitsu.com'
+});
 
-client.keys.view('jim/keys/my-key', function(err, result){
+client.keys.view('marak/keys/my-key', function(err, result){
   if (err) {
     console.log(err);
     return;
