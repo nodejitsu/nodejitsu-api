@@ -183,6 +183,7 @@ var failCodes = {
   404: 'Item not found',
   405: 'Method not Allowed',
   409: 'Conflict',
-  500: 'Internal Server Error'
+  500: 'Internal Server Error',
+  503: 'Service Unavailable'
 };
 
