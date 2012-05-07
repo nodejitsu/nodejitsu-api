@@ -1,22 +1,27 @@
 {
-    "name": "nodejitsu-api",
-    "version": "0.2.6",
-    "description": "nodejitsu API client wrapper",
-    "homepage": "http://github.com/nodejitsu/nodejitsu-api",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/nodejitsu/nodejitsu-api.git"
-    },
-    "main": "./lib/client.js",
-    "scripts": {
-      "test": "vows --spec ./test/commands/*-test.js"
-    },
-    "dependencies": {
-      "request": "2.2.x"
-    },
-    "devDependencies": {
-      "vows": "0.6.x",
-      "nock": "0.10.x"
-    },
-    "author": "Nodejitsu <info@nodejitsu.com>"
+  "name": "nodejitsu-api",
+  "version": "0.2.6",
+  "description": "nodejitsu API client wrapper",
+  "homepage": "http://github.com/nodejitsu/nodejitsu-api",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nodejitsu/nodejitsu-api.git"
+  },
+  "main": "./lib/client.js",
+  "scripts": {
+    "test": "vows --spec ./test/commands/*-test.js"
+  },
+  "dependencies": {
+    "request": "2.2.x"
+  },
+  "devDependencies": {
+    "vows": "0.6.x",
+    "nock": "0.10.x"
+  },
+  "author": "Nodejitsu Inc. <info@nodejitsu.com>",
+  "maintainers": [
+    "AvianFlu <avianflu@nodejitsu.com>",
+    "Marak <marak@nodejitsu.com>"
+  ]
 }
+
