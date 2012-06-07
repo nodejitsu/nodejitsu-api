@@ -99,7 +99,7 @@ Client.prototype.request = function (method, uri /* variable arguments */) {
       return callback(error);
     }
 
-    if (Object.keys(failCodes).indexOf(statusCode) !== -1) {
+    if (failCodes[statusCode]) {
       error = new Error('Nodejitsu Error (' + statusCode + '): ' + failCodes[statusCode]);
       error.statusCode = statusCode;
       error.result = result;
@@ -163,7 +163,7 @@ Client.prototype.upload = function (uri, contentType, file, callback, success) {
       catch (ex) {
         // Ignore Errors
       }
-      if (Object.keys(failCodes).indexOf(statusCode) !== -1) {
+      if (failCodes[statusCode]) {
         error = new Error('Nodejitsu Error (' + statusCode + '): ' + failCodes[statusCode]);
         error.result = result;
         return callback(error);
