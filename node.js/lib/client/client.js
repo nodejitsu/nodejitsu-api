@@ -82,7 +82,7 @@ Client.prototype.request = function (method, uri /* variable arguments */) {
     var statusCode, result, error;
 
     try {
-      statusCode = response.statusCode.toString();
+      statusCode = response.statusCode;
       result = JSON.parse(body);
     }
     catch (ex) {
@@ -94,7 +94,7 @@ Client.prototype.request = function (method, uri /* variable arguments */) {
     var poweredBy = response.headers['x-powered-by'];
     if (!poweredBy || poweredBy.indexOf('Nodejitsu') === -1) {
       error = new Error('Jitsu requires you to connect to Nodejitsu\'s stack (api.nodejitsu.com)');
-      error.statusCode = "403";
+      error.statusCode = 403;
       error.result = "";
       return callback(error);
     }
@@ -157,7 +157,7 @@ Client.prototype.upload = function (uri, contentType, file, callback, success) {
       var statusCode, result, error;
 
       try {
-        statusCode = response.statusCode.toString();
+        statusCode = response.statusCode;
         result = JSON.parse(body);
       }
       catch (ex) {
