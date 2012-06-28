@@ -58,6 +58,26 @@ Snapshots.prototype.create = function (appName, snapshotName, filename, callback
 };
 
 //
+// ### function fetch (appName, snapshotName, callback)
+// #### @appName {string} Name of the application to fetch a snapshot for.
+// #### @snapshotName {string} Name of the snapshot to fetch.
+// #### @callback {function} Continuation to pass control to when complete. **Optional**.
+// Fetchs a snapshot for the application with `app.name = name` and
+// `snapshot.id === snapshotName`.
+//
+Snapshots.prototype.fetch = function (appName, snapshotName, callback) {
+  var appName = defaultUser.call(this, appName),
+      argv = ['apps']
+        .concat(appName.split('/'))
+        .concat(['snapshots', snapshotName + '.tgz']);
+
+  callback = callback || function () {};
+  return this.request('GET', argv, callback, function (res, body) {
+    callback(null, body || res.statusCode);
+  });
+};
+
+//
 // ### function destroy (appName, snapshotName, callback)
 // #### @appName {string} Name of the application to destroy a snapshot for.
 // #### @snapshotName {string} Name of the snapshot to destroy.
