@@ -74,7 +74,7 @@ Client.prototype.request = function (method, uri /* variable arguments */) {
 
   self.emit('debug::request', options);
 
-  this._request(options, function (err, response, body) {
+  return this._request(options, function (err, response, body) {
     if (err) {
       return callback(err);
     }
