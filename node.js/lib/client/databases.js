@@ -29,9 +29,15 @@ util.inherits(Databases, Client);
 // Provisions a database for the user
 //
 Databases.prototype.create = function (databaseType, databaseName, callback) {
-  this.request('POST', ['databases', this.options.get('username'), databaseName], {type:databaseType}, callback, function (res, result) {
-    callback(null, result, res);
-  });
+  this.request(
+    'POST', 
+    ['databases', this.options.get('username'), databaseName], 
+    { type: databaseType }, 
+    callback, 
+    function (res, result) {
+      callback(null, result.database, res);
+    }
+  );
 };
 
 //
@@ -41,9 +47,14 @@ Databases.prototype.create = function (databaseType, databaseName, callback) {
 // Gets the metadata for the specified database
 //
 Databases.prototype.get = function (databaseName, callback) {
-  this.request('GET', ['databases', this.options.get('username'), databaseName], callback, function (res, result) {
-    callback(null, result);
-  });
+  this.request(
+    'GET', 
+    ['databases', this.options.get('username'), databaseName], 
+    callback, 
+    function (res, result) {
+      callback(null, result.database);
+    }
+  );
 };
 
 //
@@ -52,9 +63,14 @@ Databases.prototype.get = function (databaseName, callback) {
 // Gets the list of databases assigned to the user
 //
 Databases.prototype.list = function (callback) {
-  this.request('GET', ['databases', this.options.get('username')], callback, function (res, result) {
-    callback(null, result);
-  });
+  this.request(
+    'GET', 
+    ['databases', this.options.get('username')], 
+    callback, 
+    function (res, result) {
+      callback(null, result.databases);
+    }
+  );
 };
 
 //
@@ -64,7 +80,12 @@ Databases.prototype.list = function (callback) {
 // Deprovisions specified database
 //
 Databases.prototype.destroy = function (databaseName, callback) {
-   this.request('DELETE', ['databases', this.options.get('username'), databaseName], callback, function (res, result) {
-    callback(null, result);
-  });
+  this.request(
+    'DELETE', 
+    ['databases', this.options.get('username'), databaseName], 
+    callback, 
+    function (res, result) {
+      callback(null, result);
+    }
+  );
 }
