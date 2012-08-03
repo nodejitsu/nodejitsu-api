@@ -6,7 +6,7 @@ var vows = require('vows'),
 vows.describe('logs').addBatch(makeApiCall(
   'logs byApp myApp 50',
   function setup () {
-    nock('http://api.mockjitsu.com')
+    nock('https://api.mockjitsu.com')
       .post('/logs/tester/myApp', {
         from: "NOW-1DAY",
         until: "NOW",
@@ -17,7 +17,7 @@ vows.describe('logs').addBatch(makeApiCall(
 )).addBatch(makeApiCall(
   'logs byUser myUser 50',
   function setup () {
-    nock('http://api.mockjitsu.com')
+    nock('https://api.mockjitsu.com')
       .post('/logs/myUser', {
         from: "NOW-1DAY",
         until: "NOW",
