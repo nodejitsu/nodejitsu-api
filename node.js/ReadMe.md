@@ -11,7 +11,7 @@ var nj = require('nodejitsu-api'),
 var client = nj.createClient({
   username: 'marak',
   password: 'foobar',
-  remoteUri: 'http://api.nodejitsu.com'
+  remoteUri: 'https://api.nodejitsu.com'
 });
 
 client.apps.list(function(err, result){
@@ -40,7 +40,7 @@ This method sets up a client for connecting to Nodejitsu's databases. Here's a m
 var client = nj.createClient({
   username: 'marak',
   password: 'foobar',
-  remoteUri: 'http://api.nodejitsu.com'
+  remoteUri: 'https://api.nodejitsu.com'
 });
 ```
 
@@ -48,7 +48,7 @@ The options object contains three required properties:
 
 * `username`: The username for your Nodejitsu account
 * `password`: The password for your Nodejitsu account
-* `remoteUri`: The uri of the api host (typically [http://api.nodejitsu.com](http://api.nodejitsu.com)).
+* `remoteUri`: The uri of the api host (typically [https://api.nodejitsu.com](https://api.nodejitsu.com)).
 
 
 ### client

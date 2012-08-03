@@ -3,7 +3,7 @@ var nj = require('../lib/client');
 var client = nj.createClient({
       username: 'marak',
       password: 'foo',
-      remoteUri: 'http://api.nodejitsu.com'
+      remoteUri: 'https://api.nodejitsu.com'
     });
 
 client.logs.byUser('marak', 100, function(err, result){

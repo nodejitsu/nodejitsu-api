@@ -4,7 +4,7 @@ var nj = require('../lib/client'),
 var client = nj.createClient({
   username: 'marak',
   password: 'foobar',
-  remoteUri: 'http://api.nodejitsu.com'
+  remoteUri: 'https://api.nodejitsu.com'
 });
 
 client.keys.view('marak/keys/my-key', function(err, result){

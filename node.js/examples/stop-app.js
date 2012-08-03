@@ -3,7 +3,7 @@ var nj = require('../lib/client');
 var client = nj.createClient({
       username: 'marak',
       password: 'foobar',
-      remoteUri: 'http://api.nodejitsu.com'
+      remoteUri: 'https://api.nodejitsu.com'
     });
 
 client.apps.stop('marak/hellonode', function(err, result){
