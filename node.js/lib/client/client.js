@@ -57,7 +57,7 @@ Client.prototype.request = function (method, uri /* variable arguments */) {
       'Authorization': 'Basic ' + encoded,
       'Content-Type': 'application/json'
     },
-    timeout: 4 * 60 * 1000
+    timeout: 8 * 60 * 1000
   };
   
   if (body) {
