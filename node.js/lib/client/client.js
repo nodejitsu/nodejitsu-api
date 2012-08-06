@@ -7,6 +7,7 @@
 
 var fs = require('fs'),
     request = require('request'),
+    dr = require('director-reflector'),
     util = require('util'),
     EventEmitter = require('events').EventEmitter,
     Client = require('./client').Client;
@@ -18,14 +19,29 @@ var fs = require('fs'),
 // for communicating with Nodejitsu's API
 //
 var Client = exports.Client = function (options) {
-  this.options = options;
-  this._request = request;
+  
+  var self = this;
+  
+  self.options = options;
+  self._request = request;
 
-  if (typeof this.options.get !== 'function') {
-    this.options.get = function (key) {
+  if (typeof self.options.get !== 'function') {
+    self.options.get = function (key) {
       return this[key];
     }
   }
+
+  //
+  // Create an additional client for the addons server
+  //
+  self.addons = {}
+  self.addons.router = JSON.parse(fs.readFileSync(__dirname + '/addons/router.json').toString());
+  self.addons.client = dr.createClient(self.addons.router, { 
+    port: 80,
+    host: "addons.mockjitsu.com",
+    username: self.options.get('username'),
+    password: self.options.get('password')
+  });
 
 };
 

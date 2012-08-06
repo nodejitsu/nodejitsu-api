@@ -15,7 +15,8 @@ var util = require('util'),
 // with Nodejitsu's Databases API
 //
 var Databases = exports.Databases = function (options) {
-  Client = require('./client').Client;Client.call(this, options);
+  Client = require('./client').Client;
+  Client.call(this, options);
 };
 
 // Inherit from Client base object
@@ -28,16 +29,16 @@ util.inherits(Databases, Client);
 // #### @callback {function} Continuation to pass control to when complete
 // Provisions a database for the user
 //
-Databases.prototype.create = function (databaseType, databaseName, callback) {
-  this.request(
-    'POST', 
-    ['databases', this.options.get('username'), databaseName], 
-    { type: databaseType }, 
-    callback, 
-    function (res, result) {
-      callback(null, result.database, res);
-    }
-  );
+
+
+Databases.prototype.create = function (/* user, database, attrs, callback */) {
+  var args      = utile.args(arguments);
+  
+  console.log('warg', args)
+    var self = this;
+  self.addons.client.users.databases.create(user, database, { type: attrs.type, name: database }, function(err, res, body){
+    callback(err, body);
+  });
 };
 
 //
@@ -46,15 +47,10 @@ Databases.prototype.create = function (databaseType, databaseName, callback) {
 // #### @callback {function} Continuation to pass control to when complete
 // Gets the metadata for the specified database
 //
-Databases.prototype.get = function (databaseName, callback) {
-  this.request(
-    'GET', 
-    ['databases', this.options.get('username'), databaseName], 
-    callback, 
-    function (res, result) {
-      callback(null, result.database);
-    }
-  );
+Databases.prototype.get = function (user, database, callback) {
+  self.addons.client.users.databases.get(user, database, function(err, res, body){
+    callback(err, body);
+  });
 };
 
 //
@@ -63,14 +59,9 @@ Databases.prototype.get = function (databaseName, callback) {
 // Gets the list of databases assigned to the user
 //
 Databases.prototype.list = function (callback) {
-  this.request(
-    'GET', 
-    ['databases', this.options.get('username')], 
-    callback, 
-    function (res, result) {
-      callback(null, result.databases);
-    }
-  );
+  self.addons.client.users.databases(user, function(err, res, body){
+    callback(err, body);
+  });
 };
 
 //
@@ -79,13 +70,8 @@ Databases.prototype.list = function (callback) {
 // #### @callback {function} Continuation to pass control to when complete
 // Deprovisions specified database
 //
-Databases.prototype.destroy = function (databaseName, callback) {
-  this.request(
-    'DELETE', 
-    ['databases', this.options.get('username'), databaseName], 
-    callback, 
-    function (res, result) {
-      callback(null, result);
-    }
-  );
-}
+Databases.prototype.destroy = function (user, database, callback) {
+  self.addons.client.users.databases.destroy(user, database, function(err, res, body){
+    callback(err, body);
+  });
+};

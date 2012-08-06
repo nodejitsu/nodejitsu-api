@@ -6,28 +6,28 @@ var vows = require('vows'),
 vows.describe('databases').addBatch(makeApiCall(
   'databases create couch chair',
   function setup () {
-    nock('http://api.mockjitsu.com')
+    nock('http://addons.mockjitsu.com')
       .post('/databases/tester/chair', { type: 'couch'})
       .reply(200, {}, { 'x-powered-by': 'Nodejitsu' })
   }
 )).addBatch(makeApiCall(
   'databases get chair',
   function setup () {
-    nock('http://api.mockjitsu.com')
+    nock('http://addons.mockjitsu.com')
       .get('/databases/tester/chair')
       .reply(200, {}, { 'x-powered-by': 'Nodejitsu' })
   }
 )).addBatch(makeApiCall(
   'databases list',
   function setup () {
-    nock('http://api.mockjitsu.com')
+    nock('http://addons.mockjitsu.com')
       .get('/databases/tester')
       .reply(200, {}, { 'x-powered-by': 'Nodejitsu' })
   }
 )).addBatch(makeApiCall(
   'databases destroy chair',
   function setup () {
-    nock('http://api.mockjitsu.com')
+    nock('http://addons.mockjitsu.com')
       .delete('/databases/tester/chair', {})
       .reply(200, {}, { 'x-powered-by': 'Nodejitsu' })
   }

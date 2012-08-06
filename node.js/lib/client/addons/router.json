@@ -1,0 +1,103 @@
+{
+    "routes": {
+        "get": [
+            {},
+            {}
+        ],
+        "users": {
+            "([._a-zA-Z0-9-]+)": {
+                "databases": {
+                    "new": {
+                        "post": {}
+                    },
+                    "([._a-zA-Z0-9-]+)": {
+                        "update": {
+                            "post": {}
+                        },
+                        "destroy": {
+                            "post": {}
+                        },
+                        "post": {},
+                        "get": {},
+                        "delete": {},
+                        "put": {}
+                    },
+                    "get": {},
+                    "post": {}
+                },
+                "dropboxes": {
+                    "new": {
+                        "post": {}
+                    },
+                    "([._a-zA-Z0-9-]+)": {
+                        "update": {
+                            "post": {}
+                        },
+                        "destroy": {
+                            "post": {}
+                        },
+                        "post": {},
+                        "get": {},
+                        "delete": {},
+                        "put": {}
+                    },
+                    "get": {},
+                    "post": {}
+                },
+                "update": {
+                    "post": {}
+                },
+                "destroy": {
+                    "post": {}
+                },
+                "post": {},
+                "get": {},
+                "delete": {},
+                "put": {}
+            },
+            "new": {
+                "post": {}
+            },
+            "get": {},
+            "post": {}
+        },
+        "apps": {
+            "([._a-zA-Z0-9-]+)": {
+                "logs": {
+                    "new": {
+                        "post": {}
+                    },
+                    "([._a-zA-Z0-9-]+)": {
+                        "update": {
+                            "post": {}
+                        },
+                        "destroy": {
+                            "post": {}
+                        },
+                        "post": {},
+                        "get": {},
+                        "delete": {},
+                        "put": {}
+                    },
+                    "get": {},
+                    "post": {}
+                },
+                "update": {
+                    "post": {}
+                },
+                "destroy": {
+                    "post": {}
+                },
+                "post": {},
+                "get": {},
+                "delete": {},
+                "put": {}
+            },
+            "new": {
+                "post": {}
+            },
+            "get": {},
+            "post": {}
+        }
+    }
+}
