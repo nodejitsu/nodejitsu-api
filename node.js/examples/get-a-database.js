@@ -4,6 +4,7 @@ var nj = require('../lib/client'),
 var client = nj.createClient({
   username: 'marak',
   password: 'foofoo',
+  addonsUri: 'http://addons.nodejitsu.com',
   remoteUri: 'http://api.nodejitsu.com'
 });
 

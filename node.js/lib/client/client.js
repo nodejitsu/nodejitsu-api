@@ -38,7 +38,7 @@ var Client = exports.Client = function (options) {
   self.addons.router = JSON.parse(fs.readFileSync(__dirname + '/addons/router.json').toString());
   self.addons.client = dr.createClient(self.addons.router, {
     port: 80,
-    host: "addons.nodejitsu.com",
+    host: self.options.get('addonsUri'),
     username: self.options.get('username'),
     password: self.options.get('password')
   });

@@ -2,6 +2,7 @@ var createClient = require('../lib/client').createClient,
     client = createClient({
       username: 'tester',
       password: 'password',
+      addonsUri: 'https://addons.mockjitsu.com',
       remoteUri: 'http://api.mockjitsu.com'
     }),
     assert = require('assert');
