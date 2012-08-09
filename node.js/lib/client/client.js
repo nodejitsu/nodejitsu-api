@@ -19,9 +19,9 @@ var fs = require('fs'),
 // for communicating with Nodejitsu's API
 //
 var Client = exports.Client = function (options) {
-  
+
   var self = this;
-  
+
   self.options = options;
   self._request = request;
 
@@ -36,9 +36,9 @@ var Client = exports.Client = function (options) {
   //
   self.addons = {}
   self.addons.router = JSON.parse(fs.readFileSync(__dirname + '/addons/router.json').toString());
-  self.addons.client = dr.createClient(self.addons.router, { 
+  self.addons.client = dr.createClient(self.addons.router, {
     port: 80,
-    host: "addons.mockjitsu.com",
+    host: "addons.nodejitsu.com",
     username: self.options.get('username'),
     password: self.options.get('password')
   });

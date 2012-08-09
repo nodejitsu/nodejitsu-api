@@ -4,11 +4,11 @@ var nj = require('../lib/client'),
 var client = nj.createClient({
   username: 'marak',
   password: 'foofoo',
-  remoteUri: 'http://api.nodejitsu.com'
+  remoteUri: 'https://api.nodejitsu.com'
 });
 
 
-client.databases.create('marak', 'new-database-55558', { type: 'couch' }, function(err, result){
+client.databases.create('new-database-55558', 'couch', function(err, result){
   if (err) {
     console.log(err);
     return;

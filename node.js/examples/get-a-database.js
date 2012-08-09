@@ -8,7 +8,7 @@ var client = nj.createClient({
 });
 
 
-client.databases.get('marak/new-database-55558', function(err, result){
+client.databases.get('new-database-55558', function(err, result){
   if (err) {
     console.log(err);
     return;
