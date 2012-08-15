@@ -4,11 +4,11 @@
  * (C) 2010, Nodejitsu Inc.
  *
  */
- 
+
 var util = require('util'),
     Client = require('./client').Client,
     defaultUser = require('./helpers').defaultUser;
-    
+
 //
 // ### function Users (options)
 // #### @options {Object} Options for this instance
@@ -34,7 +34,7 @@ Users.prototype.auth = function (callback) {
 };
 
 //
-// ### function create (user, callback) 
+// ### function create (user, callback)
 // #### @user {Object} Properties for the new user.
 // #### @callback {function} Continuation to pass control to when complete
 // Creates a new user with the properties specified by `user`.
@@ -46,7 +46,7 @@ Users.prototype.create = function (user, callback) {
 };
 
 //
-// ### function available (username, callback) 
+// ### function available (username, callback)
 // #### @username {string} Username to check availability for.
 // #### @callback {function} Continuation to pass control to when complete
 // Checks the availability of the specified `username`.
@@ -82,7 +82,7 @@ Users.prototype.confirm = function (user, callback) {
 };
 
 //
-// ### function forgot (username, callback) 
+// ### function forgot (username, callback)
 // #### @username {Object} username requesting password reset.
 // #### @params {Object} Object containing shake and new password, if applicable.
 // #### @callback {function} Continuation to pass control to when complete

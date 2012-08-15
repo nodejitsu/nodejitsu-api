@@ -4,11 +4,11 @@
  * (C) 2010, Nodejitsu Inc.
  *
  */
- 
+
 var util = require('util'),
     Client = require('./client').Client,
     defaultUser = require('./helpers').defaultUser;
-    
+
 //
 // ### function Keys (options)
 // #### @options {Object} Options for this instance
@@ -38,7 +38,7 @@ Keys.prototype.list = function (username, callback) {
 };
 
 //
-// ### function create (key, callback) 
+// ### function create (key, callback)
 // #### @key {Object} Properties for the new key.
 // #### @callback {function} Continuation to pass control to when complete
 // Creates a new key with the properties specified by `key`.
@@ -55,7 +55,7 @@ Keys.prototype.create = function (id, key, callback) {
 
 
 //
-// ### function destroy (key, callback) 
+// ### function destroy (key, callback)
 // #### @key {Object} Properties for the new key.
 // #### @callback {function} Continuation to pass control to when complete
 // Creates a new key with the properties specified by `key`.

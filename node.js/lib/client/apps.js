@@ -43,7 +43,7 @@ Apps.prototype.list = function (username, callback) {
 // ### function create (app, callback)
 // #### @app {Object} Package.json manifest for the application.
 // #### @callback {function} Continuation to pass control to when complete
-// Creates an application with the specified package.json manifest in `app`. 
+// Creates an application with the specified package.json manifest in `app`.
 //
 Apps.prototype.create = function (app, callback) {
   var appName = defaultUser.call(this, app.name);
@@ -88,7 +88,7 @@ Apps.prototype.update = function (appName, attrs, callback) {
 // ### function destroy (appName, callback)
 // #### @appName {string} Name of the application to destroy
 // #### @callback {function} Continuation to pass control to when complete
-// Destroys the application with `name` for the authenticated user. 
+// Destroys the application with `name` for the authenticated user.
 //
 Apps.prototype.destroy = function (appName, callback) {
   var appName = defaultUser.call(this, appName),
@@ -103,7 +103,7 @@ Apps.prototype.destroy = function (appName, callback) {
 // ### function start (appName, callback)
 // #### @appName {string} Name of the application to start
 // #### @callback {function} Continuation to pass control to when complete
-// Starts the application with `name` for the authenticated user. 
+// Starts the application with `name` for the authenticated user.
 //
 Apps.prototype.start = function (appName, callback) {
   var appName = defaultUser.call(this, appName),
@@ -118,7 +118,7 @@ Apps.prototype.start = function (appName, callback) {
 // ### function restart (appName, callback)
 // #### @appName {string} Name of the application to start
 // #### @callback {function} Continuation to pass control to when complete
-// Starts the application with `name` for the authenticated user. 
+// Starts the application with `name` for the authenticated user.
 //
 Apps.prototype.restart = function (appName, callback) {
   var appName = defaultUser.call(this, appName),
@@ -133,7 +133,7 @@ Apps.prototype.restart = function (appName, callback) {
 // ### function stop (appName, callback)
 // #### @appName {string} Name of the application to stop.
 // #### @callback {function} Continuation to pass control to when complete
-// Stops the application with `name` for the authenticated user. 
+// Stops the application with `name` for the authenticated user.
 //
 Apps.prototype.stop = function (appName, callback) {
   var appName = defaultUser.call(this, appName),
@@ -148,7 +148,7 @@ Apps.prototype.stop = function (appName, callback) {
 // ### function available (app, callback)
 // #### @app {Object} Application to check availability against.
 // #### @callback {function} Continuation to respond to when complete.
-// Checks the availability of the `app.name` / `app.subdomain` combo 
+// Checks the availability of the `app.name` / `app.subdomain` combo
 // in the current Nodejitsu environment.
 //
 Apps.prototype.available = function (app, callback) {

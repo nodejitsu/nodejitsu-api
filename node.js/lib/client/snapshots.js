@@ -82,7 +82,7 @@ Snapshots.prototype.fetch = function (appName, snapshotName, callback) {
 // #### @appName {string} Name of the application to destroy a snapshot for.
 // #### @snapshotName {string} Name of the snapshot to destroy.
 // #### @callback {function} Continuation to pass control to when complete
-// Destroys a snapshot for the application with `app.name = name` and 
+// Destroys a snapshot for the application with `app.name = name` and
 // `snapshot.id === snapshotName`.
 //
 Snapshots.prototype.destroy = function (appName, snapshotName, callback) {
@@ -90,7 +90,7 @@ Snapshots.prototype.destroy = function (appName, snapshotName, callback) {
       argv = ['apps']
         .concat(appName.split('/'))
         .concat(['snapshots', snapshotName]);
-      
+
   this.request('DELETE', argv, callback, function (res, body) {
     callback(null, body || res.statusCode);
   });
@@ -101,7 +101,7 @@ Snapshots.prototype.destroy = function (appName, snapshotName, callback) {
 // #### @appName {string} Name of the application to activate a snapshot for.
 // #### @snapshotName {string} Name of the snapshot to activate.
 // #### @callback {function} Continuation to pass control to when complete
-// Activates a snapshot for the application with `app.name = name` and 
+// Activates a snapshot for the application with `app.name = name` and
 // `snapshot.id === snapshotName`.
 //
 Snapshots.prototype.activate = function (appName, snapshotName, callback) {
@@ -109,7 +109,7 @@ Snapshots.prototype.activate = function (appName, snapshotName, callback) {
       argv = ['apps']
         .concat(appName.split('/'))
         .concat(['snapshots', snapshotName, 'activate']);
-      
+
   this.request('POST', argv, callback, function (res, body) {
     callback(null, body || res.statusCode);
   });
