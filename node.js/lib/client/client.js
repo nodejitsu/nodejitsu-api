@@ -24,7 +24,7 @@ var Client = exports.Client = function (options) {
   if (typeof this.options.get !== 'function') {
     this.options.get = function (key) {
       return this[key];
-    }
+    };
   }
 
 };
@@ -38,9 +38,9 @@ util.inherits(Client, EventEmitter);
 // #### @body {Object} **optional** JSON Request Body
 // #### @callback {function} Continuation to call if errors occur.
 // #### @success {function} Continuation to call upon successful transactions
-// Makes a request to `this.remoteUri + uri` using `method` and any 
+// Makes a request to `this.remoteUri + uri` using `method` and any
 // `body` (JSON-only) if supplied. Short circuits to `callback` if the response
-// code from Nodejitsu matches `failCodes`. 
+// code from Nodejitsu matches `failCodes`.
 //
 Client.prototype.request = function (method, uri /* variable arguments */) {
   var options, args = Array.prototype.slice.call(arguments),
@@ -57,16 +57,16 @@ Client.prototype.request = function (method, uri /* variable arguments */) {
       'Authorization': 'Basic ' + encoded,
       'Content-Type': 'application/json'
     },
-    timeout: 8 * 60 * 1000
+    timeout: this.options.get('timeout') || 8 * 60 * 1000
   };
-  
+
   if (body) {
     options.body = JSON.stringify(body);
-  } 
+  }
   else if (method !== 'GET') {
     options.body = '{}';
   }
-  
+
   if (proxy) {
     options.proxy = proxy;
   }
@@ -112,13 +112,13 @@ Client.prototype.request = function (method, uri /* variable arguments */) {
 };
 
 //
-// ### function upload (uri, contentType, file, callback, success) 
+// ### function upload (uri, contentType, file, callback, success)
 // #### @uri {Array} Locator for the Remote Resource
 // #### @contentType {string} Content-Type header to use for the upload.
-// #### @file {string} Path of the local file to upload. 
+// #### @file {string} Path of the local file to upload.
 // #### @success {function} Continuation to call upon successful transactions
 // #### @callback {function} Continuation to call if errors occur.
-// Makes a `POST` request to `this.remoteUri + uri` with the data in `file` 
+// Makes a `POST` request to `this.remoteUri + uri` with the data in `file`
 // as the request body. Short circuits to `callback` if the response
 // code from Nodejitsu matches `failCodes`.
 //
