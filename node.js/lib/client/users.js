@@ -120,7 +120,7 @@ Users.prototype.update = function (username, object, callback) {
 //
 // So sad to see you go.
 //
-Users.prototype.destroy = function (username, object, callback) {
+Users.prototype.destroy = function (username, callback) {
   this.request('DELETE', ['users', username], callback, function (res, result) {
     callback(null, result);
   });
