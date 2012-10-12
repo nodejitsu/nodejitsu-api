@@ -52,7 +52,7 @@ vows.describe('users').addBatch(makeApiCall(
   'users delete jesus',
   function setup() {
     nock('https://api.mockjitsu.com')
-      .del('/users/jesus')
+      .delete('/users/jesus')
       .reply(200, {}, { 'x-powered-by': 'Nodejitsu' });
   }
 )).export(module);
