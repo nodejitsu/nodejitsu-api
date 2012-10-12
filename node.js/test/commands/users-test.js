@@ -48,4 +48,11 @@ vows.describe('users').addBatch(makeApiCall(
       .put('/users/moses', { prophet: true})
       .reply(200, {}, { 'x-powered-by': 'Nodejitsu' })
   }
+)).addBatch(makeApiCall(
+  'users delete jesus',
+  function setup() {
+    nock('https://api.mockjitsu.com')
+      .del('/users/jesus')
+      .reply(200, {}, { 'x-powered-by': 'Nodejitsu' });
+  }
 )).export(module);

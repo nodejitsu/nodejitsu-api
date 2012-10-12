@@ -110,4 +110,18 @@ Users.prototype.update = function (username, object, callback) {
   this.request('PUT', ['users', username], object, callback, function (res, result) {
     callback(null, result);
   });
-}
+};
+
+//
+// ### function destroy (username, callback)
+// #### @username {String} User to delete
+// #### @callback {function} Continuation to pass control to when complete
+// Delete user account. Use with extreme caution.
+//
+// So sad to see you go.
+//
+Users.prototype.destroy = function (username, object, callback) {
+  this.request('DELETE', ['users', username], callback, function (res, result) {
+    callback(null, result);
+  });
+};
