@@ -127,54 +127,74 @@ Client.prototype.upload = function (uri, contentType, file, callback, success) {
       options,
       out,
       encoded,
+      stat,
+      emitter = new EventEmitter(),
       proxy = self.options.get('proxy');
 
   encoded = new Buffer(this.options.get('username') + ':' + this.options.get('password')).toString('base64');
 
-  fs.stat(file, function (err, stat) {
+
+  try {
+    stat = fs.statSync(file); 
+  }
+  catch (e) {
+    return callback(err);
+  }
+  
+  options = {
+    method: 'POST',
+    uri: self.options.get('remoteUri') + '/' + uri.join('/'),
+    headers: {
+      'Authorization': 'Basic ' + encoded,
+      'Content-Type': contentType,
+      'Content-Length': stat.size
+    }
+  };
+
+  if(proxy) {
+    options.proxy = proxy;
+  }
+
+  out = self._request(options, function (err, response, body) {
     if (err) {
       return callback(err);
     }
 
-    options = {
-      method: 'POST',
-      uri: self.options.get('remoteUri') + '/' + uri.join('/'),
-      headers: {
-        'Authorization': 'Basic ' + encoded,
-        'Content-Type': contentType,
-        'Content-Length': stat.size
-      }
-    };
+    var statusCode, result, error;
 
-    if(proxy) {
-      options.proxy = proxy;
+    try {
+      statusCode = response.statusCode;
+      result = JSON.parse(body);
+    }
+    catch (ex) {
+      // Ignore Errors
+    }
+    if (failCodes[statusCode]) {
+      error = new Error('Nodejitsu Error (' + statusCode + '): ' + failCodes[statusCode]);
+      error.result = result;
+      return callback(error);
     }
 
-    out = self._request(options, function (err, response, body) {
-      if (err) {
-        return callback(err);
-      }
-
-      var statusCode, result, error;
-
-      try {
-        statusCode = response.statusCode;
-        result = JSON.parse(body);
-      }
-      catch (ex) {
-        // Ignore Errors
-      }
-      if (failCodes[statusCode]) {
-        error = new Error('Nodejitsu Error (' + statusCode + '): ' + failCodes[statusCode]);
-        error.result = result;
-        return callback(error);
-      }
-
-      success(response, result);
-    });
-
-    fs.createReadStream(file).pipe(out);
+    success(response, result);
   });
+
+  (function monkeyPatch(fn) {
+    out.write = function(data) {
+      emitter.emit('data', data);
+      fn.apply(out, arguments);
+    };
+  })(out.write);
+
+  out.on('end', function() {
+    emitter.emit('end');
+  });
+
+  fs.createReadStream(file).pipe(out);
+
+  return {
+    emitter: emitter,
+    size   : stat.size
+  };
 };
 
 var failCodes = {
