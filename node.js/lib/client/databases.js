@@ -58,14 +58,20 @@ Databases.prototype.get = function (databaseName, callback) {
 };
 
 //
-// ### function list (callback)
+// ### function list (username, callback)
 // #### @callback {function} Continuation to pass control to when complete
 // Gets the list of databases assigned to the user
 //
-Databases.prototype.list = function (callback) {
+Databases.prototype.list = function (username, callback) {
+  
+  if (arguments.length === 1) {
+    callback = username;
+    username = this.options.get('username');
+  }
+  
   this.request(
     'GET', 
-    ['databases', this.options.get('username')], 
+    ['databases', username],
     callback, 
     function (res, result) {
       callback(null, result.databases);
