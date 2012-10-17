@@ -177,16 +177,22 @@ Client.prototype.upload = function (uri, contentType, file, callback, success) {
 
     success(response, result);
   });
+ 
+  out.on('request', function(request) {
+    var buffer = 0;
+    request.on('socket', function(s) {
+      var socket = s.socket;
 
-  (function monkeyPatch(fn) {
-    out.write = function(data) {
-      emitter.emit('data', data);
-      fn.apply(out, arguments);
-    };
-  })(out.write);
-
-  out.on('end', function() {
-    emitter.emit('end');
+      var id = setInterval(function() {
+        var data = socket._bytesDispatched;
+        emitter.emit('data', data - buffer);
+        buffer = data;
+        if(buffer >= stat.size) {
+          clearInterval(id);
+          emitter.emit('end');
+        } 
+      },100);
+    });
   });
 
   fs.createReadStream(file).pipe(out);
