@@ -137,7 +137,7 @@ Client.prototype.upload = function (uri, contentType, file, callback, success) {
   try {
     stat = fs.statSync(file); 
   }
-  catch (e) {
+  catch (err) {
     return callback(err);
   }
   
