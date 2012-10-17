@@ -127,80 +127,76 @@ Client.prototype.upload = function (uri, contentType, file, callback, success) {
       options,
       out,
       encoded,
-      stat,
       emitter = new EventEmitter(),
       proxy = self.options.get('proxy');
 
   encoded = new Buffer(this.options.get('username') + ':' + this.options.get('password')).toString('base64');
 
-
-  try {
-    stat = fs.statSync(file); 
-  }
-  catch (err) {
-    return callback(err);
-  }
-  
-  options = {
-    method: 'POST',
-    uri: self.options.get('remoteUri') + '/' + uri.join('/'),
-    headers: {
-      'Authorization': 'Basic ' + encoded,
-      'Content-Type': contentType,
-      'Content-Length': stat.size
-    }
-  };
-
-  if(proxy) {
-    options.proxy = proxy;
-  }
-
-  out = self._request(options, function (err, response, body) {
+  fs.stat(file, function (err, stat) {
     if (err) {
       return callback(err);
     }
 
-    var statusCode, result, error;
+    emitter.emit('start', stat);
 
-    try {
-      statusCode = response.statusCode;
-      result = JSON.parse(body);
-    }
-    catch (ex) {
-      // Ignore Errors
-    }
-    if (failCodes[statusCode]) {
-      error = new Error('Nodejitsu Error (' + statusCode + '): ' + failCodes[statusCode]);
-      error.result = result;
-      return callback(error);
+    options = {
+      method: 'POST',
+      uri: self.options.get('remoteUri') + '/' + uri.join('/'),
+      headers: {
+        'Authorization': 'Basic ' + encoded,
+        'Content-Type': contentType,
+        'Content-Length': stat.size
+      }
+    };
+
+    if(proxy) {
+      options.proxy = proxy;
     }
 
-    success(response, result);
-  });
- 
-  out.on('request', function(request) {
-    var buffer = 0;
-    request.on('socket', function(s) {
-      var socket = s.socket;
+    out = self._request(options, function (err, response, body) {
+      if (err) {
+        return callback(err);
+      }
 
-      var id = setInterval(function() {
-        var data = socket._bytesDispatched;
-        emitter.emit('data', data - buffer);
-        buffer = data;
-        if(buffer >= stat.size) {
-          clearInterval(id);
-          emitter.emit('end');
-        } 
-      },100);
+      var statusCode, result, error;
+
+      try {
+        statusCode = response.statusCode;
+        result = JSON.parse(body);
+      }
+      catch (ex) {
+        // Ignore Errors
+      }
+      if (failCodes[statusCode]) {
+        error = new Error('Nodejitsu Error (' + statusCode + '): ' + failCodes[statusCode]);
+        error.result = result;
+        return callback(error);
+      }
+
+      success(response, result);
     });
+ 
+    out.on('request', function(request) {
+      var buffer = 0;
+      request.on('socket', function(s) {
+        var socket = s.socket;
+
+        var id = setInterval(function() {
+          var data = socket._bytesDispatched;
+          emitter.emit('data', data - buffer);
+          buffer = data;
+          if(buffer >= stat.size) {
+            clearInterval(id);
+            emitter.emit('end');
+          } 
+        },100);
+      });
+    });
+
+    fs.createReadStream(file).pipe(out);
   });
 
-  fs.createReadStream(file).pipe(out);
-
-  return {
-    emitter: emitter,
-    size   : stat.size
-  };
+  return emitter;
 };
 
 var failCodes = {
