@@ -12,7 +12,7 @@
     "test": "vows --spec ./test/commands/*-test.js"
   },
   "dependencies": {
-    "request": "2.11.x"
+    "request": "2.9.203"
   },
   "devDependencies": {
     "vows": "0.6.x",
