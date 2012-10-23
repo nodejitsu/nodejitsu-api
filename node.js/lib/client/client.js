@@ -180,7 +180,7 @@ Client.prototype.upload = function (uri, contentType, file, callback, success) {
       var buffer = 0;
       request.on('socket', function(socket) { 
         var id = setInterval(function() {
-          var data = socket._bytesDispatched;
+          var data = socket._bytesDispatched || (socket.socket && socket.socket._bytesDispatched);
           emitter.emit('data', data - buffer);
           buffer = data;
           if(buffer >= stat.size) {
