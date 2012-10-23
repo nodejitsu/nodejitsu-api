@@ -178,9 +178,7 @@ Client.prototype.upload = function (uri, contentType, file, callback, success) {
  
     out.on('request', function(request) {
       var buffer = 0;
-      request.on('socket', function(s) {
-        var socket = s.socket;
-
+      request.on('socket', function(socket) { 
         var id = setInterval(function() {
           var data = socket._bytesDispatched;
           emitter.emit('data', data - buffer);
