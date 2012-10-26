@@ -159,3 +159,19 @@ Apps.prototype.available = function (app, callback) {
     callback(null, result || res.statusCode);
   });
 };
+
+//
+// ### function setDrones (app, callback)
+// #### @app {string} Name of the application to set number of drones for.
+// #### @drones {Number} Number of drones to run.
+// #### @callback {function} Continuation to respond to when complete.
+// Runs `app` on `drones` drones.
+//
+Apps.prototype.setDrones = function (appName, drones, callback) {
+  appName = defaultUser.call(this, appName);
+  argv = ['apps'].concat(appName.split('/')).concat('drones');
+
+  this.request('POST', argv, { drones: drones }, callback, function (res, result) {
+    callback(null, result || res.statusCode);
+  });
+};
