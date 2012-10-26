@@ -146,7 +146,8 @@ Client.prototype.upload = function (uri, contentType, file, callback, success) {
         'Authorization': 'Basic ' + encoded,
         'Content-Type': contentType,
         'Content-Length': stat.size
-      }
+      },
+      timeout: self.options.get('timeout') || 8 * 60 * 1000
     };
 
     if(proxy) {
