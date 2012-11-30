@@ -2,6 +2,7 @@ var vows = require('vows'),
     assert = require('assert'),
     nock = require('nock'),
     path = require('path'),
+    os = require('os'),
     makeApiCall = require('../macros').makeApiCall;
 
 vows.describe('snapshots').addBatch(makeApiCall(
@@ -32,7 +33,7 @@ vows.describe('snapshots').addBatch(makeApiCall(
   ].join(' '),
   function setup () {
     nock('https://api.mockjitsu.com')
-      .post('/apps/tester/myApp/snapshots/v0.0.0', 'This is only a test.\n')
+      .post('/apps/tester/myApp/snapshots/v0.0.0', 'This is only a test.' + os.EOL)
       .reply(200, {}, { 'x-powered-by': 'Nodejitsu' })
   }
 )).export(module);
