@@ -15,7 +15,7 @@
     "request": "2.9.203"
   },
   "devDependencies": {
-    "vows": "0.6.x",
+    "vows": "0.7.x",
     "nock": "0.10.x"
   },
   "author": "Nodejitsu Inc. <info@nodejitsu.com>",
