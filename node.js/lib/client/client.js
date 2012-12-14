@@ -93,8 +93,8 @@ Client.prototype.request = function (method, uri /* variable arguments */) {
     self.emit('debug::response', { statusCode: statusCode, result: result });
 
     var poweredBy = response.headers['x-powered-by'];
-    if (!poweredBy || poweredBy.indexOf('Nodejitsu') === -1) {
-      error = new Error('Jitsu requires you to connect to Nodejitsu\'s stack (api.nodejitsu.com)');
+    if (!self.options.get('ignorePoweredBy') && !poweredBy || poweredBy.indexOf('Nodejitsu') === -1) {
+      error = new Error('The Nodejitsu-API requires you to connect the Nodejitsu\'s stack (api.nodejitsu.com)');
       error.statusCode = 403;
       error.result = "";
       return callback(error);
@@ -176,10 +176,10 @@ Client.prototype.upload = function (uri, contentType, file, callback, success) {
 
       success(response, result);
     });
- 
+
     out.on('request', function(request) {
       var buffer = 0;
-      request.on('socket', function(socket) { 
+      request.on('socket', function(socket) {
         var id = setInterval(function() {
           var data = socket._bytesDispatched || (socket.socket && socket.socket._bytesDispatched);
           emitter.emit('data', data - buffer);
@@ -187,7 +187,7 @@ Client.prototype.upload = function (uri, contentType, file, callback, success) {
           if(buffer >= stat.size) {
             clearInterval(id);
             emitter.emit('end');
-          } 
+          }
         },100);
       });
     });
