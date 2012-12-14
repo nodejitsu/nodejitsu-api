@@ -28,29 +28,28 @@ util.inherits(Apps, Client);
 // Lists all applications for the authenticated user
 //
 Apps.prototype.list = function (username, callback) {
-
-  if (arguments.length == 1) {
+  if (arguments.length === 1) {
     callback = username;
     username = this.options.get('username');
   }
 
   this.request('GET', ['apps', username], callback, function (res, result) {
     callback(null, result.apps || res.statusCode);
-  })
+  });
 };
 
 //
 // ### function create (app, callback)
 // #### @app {Object} Package.json manifest for the application.
 // #### @callback {function} Continuation to pass control to when complete
-// Creates an application with the specified package.json manifest in `app`. 
+// Creates an application with the specified package.json manifest in `app`.
 //
 Apps.prototype.create = function (app, callback) {
   var appName = defaultUser.call(this, app.name);
 
   this.request('POST', ['apps', appName], app, callback, function (res, result) {
     callback(null, result || res.statusCode);
-  })
+  });
 };
 
 //
@@ -60,12 +59,12 @@ Apps.prototype.create = function (app, callback) {
 // Views the application specified by `name`.
 //
 Apps.prototype.view = function (appName, callback) {
-  var appName = defaultUser.call(this, appName),
-      argv = ['apps'].concat(appName.split('/'));
+  appName = defaultUser.call(this, appName);
+  var argv = ['apps'].concat(appName.split('/'));
 
   this.request('GET', argv, callback, function (res, result) {
     callback(null, result.app || res.statusCode);
-  })
+  });
 };
 
 //
@@ -76,8 +75,8 @@ Apps.prototype.view = function (appName, callback) {
 // Updates the application with `name` with the specified attributes in `attrs`
 //
 Apps.prototype.update = function (appName, attrs, callback) {
-  var appName = defaultUser.call(this, appName);
-      argv = ['apps'].concat(appName.split('/'));
+  appName = defaultUser.call(this, appName);
+  var argv = ['apps'].concat(appName.split('/'));
 
   this.request('PUT', argv, attrs, callback, function (res, result) {
     callback(null, result || res.statusCode);
@@ -88,26 +87,26 @@ Apps.prototype.update = function (appName, attrs, callback) {
 // ### function destroy (appName, callback)
 // #### @appName {string} Name of the application to destroy
 // #### @callback {function} Continuation to pass control to when complete
-// Destroys the application with `name` for the authenticated user. 
+// Destroys the application with `name` for the authenticated user.
 //
 Apps.prototype.destroy = function (appName, callback) {
-  var appName = defaultUser.call(this, appName),
-      argv = ['apps'].concat(appName.split('/'));
+  appName = defaultUser.call(this, appName);
+  var argv = ['apps'].concat(appName.split('/'));
 
   this.request('DELETE', argv, callback, function (res, result) {
     callback(null, result || res.statusCode);
-  })
+  });
 };
 
 //
 // ### function start (appName, callback)
 // #### @appName {string} Name of the application to start
 // #### @callback {function} Continuation to pass control to when complete
-// Starts the application with `name` for the authenticated user. 
+// Starts the application with `name` for the authenticated user.
 //
 Apps.prototype.start = function (appName, callback) {
-  var appName = defaultUser.call(this, appName),
-      argv = ['apps'].concat(appName.split('/')).concat('start');
+  appName = defaultUser.call(this, appName);
+  var argv = ['apps'].concat(appName.split('/')).concat('start');
 
   this.request('POST', argv, callback, function (res, result) {
     callback(null, result || res.statusCode);
@@ -118,11 +117,11 @@ Apps.prototype.start = function (appName, callback) {
 // ### function restart (appName, callback)
 // #### @appName {string} Name of the application to start
 // #### @callback {function} Continuation to pass control to when complete
-// Starts the application with `name` for the authenticated user. 
+// Starts the application with `name` for the authenticated user.
 //
 Apps.prototype.restart = function (appName, callback) {
-  var appName = defaultUser.call(this, appName),
-      argv = ['apps'].concat(appName.split('/')).concat('restart');
+  appName = defaultUser.call(this, appName);
+  var argv = ['apps'].concat(appName.split('/')).concat('restart');
 
   this.request('POST', argv, callback, function (res, result) {
     callback(null, result || res.statusCode);
@@ -133,11 +132,11 @@ Apps.prototype.restart = function (appName, callback) {
 // ### function stop (appName, callback)
 // #### @appName {string} Name of the application to stop.
 // #### @callback {function} Continuation to pass control to when complete
-// Stops the application with `name` for the authenticated user. 
+// Stops the application with `name` for the authenticated user.
 //
 Apps.prototype.stop = function (appName, callback) {
-  var appName = defaultUser.call(this, appName),
-      argv = ['apps'].concat(appName.split('/')).concat('stop');
+  appName = defaultUser.call(this, appName);
+  var argv = ['apps'].concat(appName.split('/')).concat('stop');
 
   this.request('POST', argv, callback, function (res, result) {
     callback(null, result || res.statusCode);
@@ -148,7 +147,7 @@ Apps.prototype.stop = function (appName, callback) {
 // ### function available (app, callback)
 // #### @app {Object} Application to check availability against.
 // #### @callback {function} Continuation to respond to when complete.
-// Checks the availability of the `app.name` / `app.subdomain` combo 
+// Checks the availability of the `app.name` / `app.subdomain` combo
 // in the current Nodejitsu environment.
 //
 Apps.prototype.available = function (app, callback) {
@@ -168,8 +167,8 @@ Apps.prototype.available = function (app, callback) {
 // Runs `app` on `drones` drones.
 //
 Apps.prototype.setDrones = function (appName, drones, callback) {
-  appName = defaultUser.call(this, appName);
-  argv = ['apps'].concat(appName.split('/')).concat('drones');
+  defaultUser.call(this, appName);
+  var argv = ['apps'].concat(appName.split('/')).concat('drones');
 
   this.request('POST', argv, { drones: drones }, callback, function (res, result) {
     callback(null, result || res.statusCode);
