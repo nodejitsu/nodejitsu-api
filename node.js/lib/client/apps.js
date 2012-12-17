@@ -167,7 +167,7 @@ Apps.prototype.available = function (app, callback) {
 // Runs `app` on `drones` drones.
 //
 Apps.prototype.setDrones = function (appName, drones, callback) {
-  defaultUser.call(this, appName);
+  appName = defaultUser.call(this, appName);
   var argv = ['apps'].concat(appName.split('/')).concat('drones');
 
   this.request('POST', argv, { drones: drones }, callback, function (res, result) {
