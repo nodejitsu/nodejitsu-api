@@ -46,7 +46,7 @@ Client.prototype.request = function (method, uri /* variable arguments */) {
   var options, args = Array.prototype.slice.call(arguments),
       success = args.pop(),
       callback = args.pop(),
-      body = typeof args[args.length - 1] === 'object' && !Array.isArray(args[args.length - 1]) && args.pop(),
+      body = typeof args[args.length - 1] === 'object' && args[args.length - 1] !== uri && args.pop(),
       encoded = new Buffer(this.options.get('username') + ':' + this.options.get('password')).toString('base64'),
       proxy = this.options.get('proxy');
 
