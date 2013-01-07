@@ -1,3 +1,5 @@
+'use strict';
+
 /*
  * snapshots.js: Client for the Nodejitsu snapshots API.
  *
@@ -29,11 +31,13 @@ util.inherits(Snapshots, Client);
 // Lists all applications for the authenticated user
 //
 Snapshots.prototype.list = function (appName, callback) {
-  var username = defaultUser.call(this, appName),
-      argv = ['apps'].concat(username.split('/')).concat('snapshots');
+  appName = defaultUser.call(this, appName);
+  var argv = ['apps'].concat(appName.split('/')).concat('snapshots');
 
-  this.request('GET', argv, callback, function (res, result) {
-    callback(null, result.snapshots);
+  this.request({ uri: argv }, function (err, result) {
+    if (err) return callback(err);
+
+    callback(err, result.snapshots);
   });
 };
 
@@ -47,10 +51,8 @@ Snapshots.prototype.list = function (appName, callback) {
 // `app.name = name` using the `*.tgz` package data in `filename` file.
 //
 Snapshots.prototype.create = function (appName, snapshotName, filename, callback) {
-  var appName = defaultUser.call(this, appName),
-      argv = ['apps']
-        .concat(appName.split('/'))
-        .concat(['snapshots', snapshotName]);
+  appName = defaultUser.call(this, appName);
+  var argv = ['apps'].concat(appName.split('/')).concat(['snapshots', snapshotName]);
 
   return this.upload(argv, 'application/octet-stream', filename, callback, function (res, body) {
     callback(null, body || res.statusCode);
@@ -66,15 +68,11 @@ Snapshots.prototype.create = function (appName, snapshotName, filename, callback
 // `snapshot.id === snapshotName`.
 //
 Snapshots.prototype.fetch = function (appName, snapshotName, callback) {
-  var appName = defaultUser.call(this, appName),
-      argv = ['apps']
-        .concat(appName.split('/'))
-        .concat(['snapshots', snapshotName + '.tgz']);
+  appName = defaultUser.call(this, appName);
+  var argv = ['apps'].concat(appName.split('/')).concat(['snapshots', snapshotName + '.tgz']);
 
   callback = callback || function () {};
-  return this.request('GET', argv, callback, function (res, body) {
-    callback(null, body || res.statusCode);
-  });
+  return this.request({ uri: argv }, callback);
 };
 
 //
@@ -82,18 +80,14 @@ Snapshots.prototype.fetch = function (appName, snapshotName, callback) {
 // #### @appName {string} Name of the application to destroy a snapshot for.
 // #### @snapshotName {string} Name of the snapshot to destroy.
 // #### @callback {function} Continuation to pass control to when complete
-// Destroys a snapshot for the application with `app.name = name` and 
+// Destroys a snapshot for the application with `app.name = name` and
 // `snapshot.id === snapshotName`.
 //
 Snapshots.prototype.destroy = function (appName, snapshotName, callback) {
-  var appName = defaultUser.call(this, appName),
-      argv = ['apps']
-        .concat(appName.split('/'))
-        .concat(['snapshots', snapshotName]);
-      
-  this.request('DELETE', argv, callback, function (res, body) {
-    callback(null, body || res.statusCode);
-  });
+  appName = defaultUser.call(this, appName);
+  var argv = ['apps'].concat(appName.split('/')).concat(['snapshots', snapshotName]);
+
+  this.request({ method: 'DELETE', uri: argv }, callback);
 };
 
 //
@@ -101,16 +95,12 @@ Snapshots.prototype.destroy = function (appName, snapshotName, callback) {
 // #### @appName {string} Name of the application to activate a snapshot for.
 // #### @snapshotName {string} Name of the snapshot to activate.
 // #### @callback {function} Continuation to pass control to when complete
-// Activates a snapshot for the application with `app.name = name` and 
+// Activates a snapshot for the application with `app.name = name` and
 // `snapshot.id === snapshotName`.
 //
 Snapshots.prototype.activate = function (appName, snapshotName, callback) {
-  var appName = defaultUser.call(this, appName),
-      argv = ['apps']
-        .concat(appName.split('/'))
-        .concat(['snapshots', snapshotName, 'activate']);
-      
-  this.request('POST', argv, callback, function (res, body) {
-    callback(null, body || res.statusCode);
-  });
+  appName = defaultUser.call(this, appName);
+  var argv = ['apps'].concat(appName.split('/')).concat(['snapshots', snapshotName, 'activate']);
+
+  this.request({ method: 'POST', uri: argv }, callback);
 };
