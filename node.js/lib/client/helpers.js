@@ -1,3 +1,5 @@
+'use strict';
+
 //
 // ### function defaultUser (appName)
 // #### @appName {String} App name
@@ -11,4 +13,4 @@ exports.defaultUser = function (appName) {
   }
 
   return appName;
-}
+};

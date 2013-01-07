@@ -1,3 +1,5 @@
+'use strict';
+
 /*
  * client.js: Client base for the Nodejitsu API clients.
  *
@@ -8,8 +10,7 @@
 var fs = require('fs'),
     request = require('request'),
     util = require('util'),
-    EventEmitter = require('events').EventEmitter,
-    Client = require('./client').Client;
+    EventEmitter = require('events').EventEmitter;
 
 //
 // ### function Client (options)
@@ -32,83 +33,76 @@ var Client = exports.Client = function (options) {
 util.inherits(Client, EventEmitter);
 
 //
-// ### @private function request (method, uri, [body], success, callback)
-// #### @method {string} HTTP method to use
-// #### @uri {Array} Locator for the Remote Resource
-// #### @body {Object} **optional** JSON Request Body
+// ### @private function request (options, callback)
+// #### @options {Object}
 // #### @callback {function} Continuation to call if errors occur.
-// #### @success {function} Continuation to call upon successful transactions
-// Makes a request to `this.remoteUri + uri` using `method` and any
-// `body` (JSON-only) if supplied. Short circuits to `callback` if the response
-// code from Nodejitsu matches `failCodes`.
+// Makes a request to the remoteUri + uri using the HTTP and any body if
+// supplied.
 //
-Client.prototype.request = function (method, uri /* variable arguments */) {
-  var options, args = Array.prototype.slice.call(arguments),
-      success = args.pop(),
-      callback = args.pop(),
-      body = typeof args[args.length - 1] === 'object' && !Array.isArray(args[args.length - 1]) && args.pop(),
-      token = this.options.get('password') || this.options.get('api-token'),
-      encoded = new Buffer(this.options.get('username') + ':' + token).toString('base64'),
-      proxy = this.options.get('proxy');
+// Options:
+// - method {String}: HTTP method to use
+// - uri {Array}: Locator for the remote resource
+// - remoteUri {String}: Location of the remote API
+// - timeout {Number}: Request timeout
+// - body {Array|Object}: JSON request body
+//
+Client.prototype.request = function (options, callback) {
+  options = options || {};
 
-  options = {
-    method: method || 'GET',
-    uri: this.options.get('remoteUri') + '/' + uri.join('/'),
+  var password = this.options.get('password') || this.options.get('api-token'),
+      auth = new Buffer(this.options.get('username') + ':' + password).toString('base64'),
+      proxy = this.options.get('proxy'),
+      self = this,
+      opts = {};
+
+  opts = {
+    method: options.method || 'GET',
+    uri: (options.remoteUri || this.options.get('remoteUri')) + '/' + options.uri.join('/'),
     headers: {
-      'Authorization': 'Basic ' + encoded,
+      'Authorization': 'Basic ' + auth,
       'Content-Type': 'application/json'
     },
-    timeout: this.options.get('timeout') || 8 * 60 * 1000
+    timeout: options.timeout || this.options.get('timeout') || 8 * 60 * 1000,
   };
 
-  if (body) {
-    options.body = JSON.stringify(body);
-  }
-  else if (method !== 'GET') {
-    options.body = '{}';
-  }
-
-  if (proxy) {
-    options.proxy = proxy;
+  if (options.body) {
+    try { opts.body = JSON.stringify(options.body); }
+    catch (e) { return callback(e); }
+  } else if (opts.method !== 'GET') {
+    opts.body = '{}';
   }
 
-  var self = this;
+  if (proxy) opts.proxy = proxy;
 
-  self.emit('debug::request', options);
+  this.emit('debug::request', opts);
 
-  return this._request(options, function (err, response, body) {
-    if (err) {
-      return callback(err);
-    }
+  return this._request(opts, function requesting(err, res, body) {
+    if (err) return callback(err);
 
-    var statusCode, result, error;
+    var poweredBy = res.headers['x-powered-by'],
+        result, statusCode, error;
 
     try {
-      statusCode = response.statusCode;
+      statusCode = res.statusCode;
       result = JSON.parse(body);
-    }
-    catch (ex) {
-      // Ignore Errors
-    }
+    } catch (e) {}
 
     self.emit('debug::response', { statusCode: statusCode, result: result });
 
-    var poweredBy = response.headers['x-powered-by'];
-    if (!self.options.get('ignorePoweredBy') && !poweredBy || poweredBy.indexOf('Nodejitsu') === -1) {
+    if (!self.options.get('ignorePoweredBy') && !poweredBy || !~poweredBy.indexOf('Nodejitsu')) {
       error = new Error('The Nodejitsu-API requires you to connect the Nodejitsu\'s stack (api.nodejitsu.com)');
       error.statusCode = 403;
-      error.result = "";
-      return callback(error);
-    }
-
-    if (failCodes[statusCode]) {
+      error.result = '';
+    } else if (failCodes[statusCode]) {
       error = new Error('Nodejitsu Error (' + statusCode + '): ' + failCodes[statusCode]);
       error.statusCode = statusCode;
       error.result = result;
-      return callback(error);
     }
 
-    success(response, result);
+    // Only add the response argument when people ask for it
+    if (callback.length === 3) return callback(error, result, res);
+
+    callback(error, result);
   });
 };
 

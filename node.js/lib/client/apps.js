@@ -1,3 +1,5 @@
+'use strict';
+
 /*
  * app.js: Client for the Nodejitsu apps API.
  *
@@ -33,8 +35,10 @@ Apps.prototype.list = function (username, callback) {
     username = this.options.get('username');
   }
 
-  this.request('GET', ['apps', username], callback, function (res, result) {
-    callback(null, result.apps || res.statusCode);
+  this.request({ uri: ['apps', username] }, function (err, result, res) {
+    if (err) return callback(err);
+
+    callback(err, result.apps || res.statusCode);
   });
 };
 
@@ -47,7 +51,9 @@ Apps.prototype.list = function (username, callback) {
 Apps.prototype.create = function (app, callback) {
   var appName = defaultUser.call(this, app.name);
 
-  this.request('POST', ['apps', appName], app, callback, function (res, result) {
+  this.request({ method: 'POST', uri: ['apps', appName], body: app }, function (err, result, res) {
+    if (err) return callback(err);
+
     callback(null, result || res.statusCode);
   });
 };
@@ -62,8 +68,10 @@ Apps.prototype.view = function (appName, callback) {
   appName = defaultUser.call(this, appName);
   var argv = ['apps'].concat(appName.split('/'));
 
-  this.request('GET', argv, callback, function (res, result) {
-    callback(null, result.app || res.statusCode);
+  this.request({ uri: argv }, function (err, result, res) {
+    if (err) return callback(err);
+
+    callback(err, result.app || res.statusCode);
   });
 };
 
@@ -78,8 +86,10 @@ Apps.prototype.update = function (appName, attrs, callback) {
   appName = defaultUser.call(this, appName);
   var argv = ['apps'].concat(appName.split('/'));
 
-  this.request('PUT', argv, attrs, callback, function (res, result) {
-    callback(null, result || res.statusCode);
+  this.request({ method: 'PUT', uri: argv, body: attrs }, function (err, result, res) {
+    if (err) return callback(err);
+
+    callback(err, result || res.statusCode);
   });
 };
 
@@ -93,8 +103,10 @@ Apps.prototype.destroy = function (appName, callback) {
   appName = defaultUser.call(this, appName);
   var argv = ['apps'].concat(appName.split('/'));
 
-  this.request('DELETE', argv, callback, function (res, result) {
-    callback(null, result || res.statusCode);
+  this.request({ method: 'DELETE', uri: argv }, function (err, result, res) {
+    if (err) return callback(err);
+
+    callback(err, result || res.statusCode);
   });
 };
 
@@ -108,8 +120,10 @@ Apps.prototype.start = function (appName, callback) {
   appName = defaultUser.call(this, appName);
   var argv = ['apps'].concat(appName.split('/')).concat('start');
 
-  this.request('POST', argv, callback, function (res, result) {
-    callback(null, result || res.statusCode);
+  this.request({ method: 'POST', uri: argv }, function (err, result, res) {
+    if (err) return callback(err);
+
+    callback(err, result || res.statusCode);
   });
 };
 
@@ -123,8 +137,10 @@ Apps.prototype.restart = function (appName, callback) {
   appName = defaultUser.call(this, appName);
   var argv = ['apps'].concat(appName.split('/')).concat('restart');
 
-  this.request('POST', argv, callback, function (res, result) {
-    callback(null, result || res.statusCode);
+  this.request({ method: 'POST', uri: argv }, function (err, result, res) {
+    if (err) return callback(err);
+
+    callback(err, result || res.statusCode);
   });
 };
 
@@ -138,8 +154,10 @@ Apps.prototype.stop = function (appName, callback) {
   appName = defaultUser.call(this, appName);
   var argv = ['apps'].concat(appName.split('/')).concat('stop');
 
-  this.request('POST', argv, callback, function (res, result) {
-    callback(null, result || res.statusCode);
+  this.request({ method: 'POST', uri: argv }, function (err, result, res) {
+    if (err) return callback(err);
+
+    callback(err, result || res.statusCode);
   });
 };
 
@@ -154,8 +172,10 @@ Apps.prototype.available = function (app, callback) {
   var appName = defaultUser.call(this, app.name),
       argv = ['apps'].concat(appName.split('/')).concat('available');
 
-  this.request('POST', argv, app, callback, function (res, result) {
-    callback(null, result || res.statusCode);
+  this.request({ method: 'POST', uri: argv, body: app }, function (err, result, res) {
+    if (err) return callback(err);
+
+    callback(err, result || res.statusCode);
   });
 };
 
@@ -170,7 +190,9 @@ Apps.prototype.setDrones = function (appName, drones, callback) {
   appName = defaultUser.call(this, appName);
   var argv = ['apps'].concat(appName.split('/')).concat('drones');
 
-  this.request('POST', argv, { drones: drones }, callback, function (res, result) {
-    callback(null, result || res.statusCode);
+  this.request({ method: 'POST', uri: argv, body: { drones: drones }}, function (err, result, res) {
+    if (err) return callback(err);
+
+    callback(err, result || res.statusCode);
   });
 };
