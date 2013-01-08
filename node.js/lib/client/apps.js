@@ -18,82 +18,11 @@ var util = require('util'),
 // with Nodejitsu's Apps API
 //
 var Apps = exports.Apps = function (options) {
-  this.clouds = {};
-  this.datacenters = {};
-
   Client.call(this, options);
 };
 
 // Inherit from Client base object
 util.inherits(Apps, Client);
-
-//
-// ### @private function request
-// #### @options {Object}
-// #### @callback {function} Continuation to call if errors occur.
-// Overrites the default request logic to make it aware of datacenter locations
-//
-Apps.prototype.request = function (options, callback) {
-  var self = this,
-      flow = [];
-
-  // we don't need to have any datacenter information for these types of calls
-  if (options.remoteUri || !options.app || !options.method || options.method === 'GET') {
-    return Client.prototype.request.apply(this, arguments);
-  }
-
-  //
-  // We don't have any datacenter data by default as it's only needed for
-  // starting or stopping the application.
-  //
-  if (!Object.keys(this.datacenters)) flow.push(function (done) {
-    self.endpoints(function endpoints(err, datacenters) {
-      if (err) return done(err);
-
-      self.datacenters = datacenters;
-      done();
-    });
-  });
-
-  //
-  // Make sure that we have this app in our cloud cache so we know in which
-  // datacenter it is.
-  //
-  if (!(options.app in this.clouds)) flow.push(function (done) {
-    self.list(function apps(err, applications) {
-      if (err) return done(err);
-
-      self.clouds = applications.reduce(function reduce(memo, app) {
-        memo[app] = app.cloud;
-      }, {});
-
-      done();
-    });
-  });
-
-  //
-  // Upgrade the remoteUri to the correct location of the datacenter or we will
-  // not be able to communicate correctly with it.
-  //
-  flow.push(function (done) {
-    var cloud = self.clouds[options.app];
-
-    options.remoteUri = self.datacenters[cloud.provider][cloud.datacenter];
-    Client.prototype.request.call(self, options, callback);
-  });
-
-  var completed = 0;
-  (function iterate() {
-    flow[completed](function next(err) {
-      if (err) {
-        callback(err);
-      } else {
-        completed++;
-        if (completed !== flow.length) iterate();
-      }
-    });
-  }());
-};
 
 //
 // ### function list (username, callback)
@@ -192,7 +121,7 @@ Apps.prototype.restart = function (appName, callback) {
   appName = defaultUser.call(this, appName);
   var argv = ['apps'].concat(appName.split('/')).concat('restart');
 
-  this.request({ method: 'POST', uri: argv }, callback);
+  this.cloud({ method: 'POST', uri: argv, app: appName }, this.request, callback);
 };
 
 //

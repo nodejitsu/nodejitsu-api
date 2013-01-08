@@ -8,8 +8,9 @@
  */
 
 var fs = require('fs'),
-    request = require('request'),
     util = require('util'),
+    request = require('request'),
+    async = require('./helpers').async,
     EventEmitter = require('events').EventEmitter;
 
 //
@@ -19,6 +20,8 @@ var fs = require('fs'),
 // for communicating with Nodejitsu's API
 //
 var Client = exports.Client = function (options) {
+  this.clouds = {};
+  this.datacenters = {};
   this.options = options;
   this._request = request;
 
@@ -33,8 +36,78 @@ var Client = exports.Client = function (options) {
 util.inherits(Client, EventEmitter);
 
 //
+// ### @private function cloud (options, api, callback)
+// #### @options {Object} Configuration
+// #### @api {Function} Private API that needs to be called, request / upload
+// #### @callback {Function} Continuation
+// Transforms the given API in to a cloud aware method assigning it to the
+// correct datacenter.
+//
+Client.prototype.cloud = function (options, api, callback) {
+  var self = this,
+      flow = [];
+
+  // We don't need to have any datacenter information for these types of calls
+  if (options.remoteUri || !options.app || !options.method || options.method === 'GET') {
+    return api.call(this, options, callback);
+  }
+
+  //
+  // We don't have any datacenter data by default as it's only needed for
+  // starting or stopping the application.
+  //
+  if (!Object.keys(this.datacenters).length) flow.push(function (done) {
+    self.request({ uri: ['endpoints'] }, function endpoints(err, datacenters) {
+      if (err) return done(err);
+
+      self.datacenters = datacenters.endpoints;
+      done();
+    });
+  });
+
+  //
+  // Make sure that we have this app in our cloud cache so we know in which
+  // datacenter it is.
+  //
+  if (!(options.app in this.clouds)) flow.push(function (done) {
+    var argv = ['apps', options.app, 'cloud'];
+
+    self.request({ uri: argv }, function apps(err, result) {
+      if (err) return done(err);
+
+      // For some odd reason, the result is an array of arrays.
+      self.clouds[options.app] = result[0];
+      done();
+    });
+  });
+
+  //
+  // Iterate over the possible steps.
+  //
+  async.iterate(flow, function completed(err) {
+    if (err) return callback(err);
+
+    // The returned clouds is an array of datacenters, iterate over them.
+    async.map(self.clouds[options.app], function iterate(cloud, done) {
+      //
+      // Clone the options to prevent race conditions.
+      //
+      var opts = Object.keys(options).reduce(function clone(memo, field) {
+        memo[field] = options[field];
+        return memo;
+      }, {});
+
+      opts.remoteUri = self.datacenters[cloud.provider][cloud.datacenter];
+      if (!~opts.remoteUri.indexOf('http')) opts.remoteUri = 'http://'+ opts.remoteUri;
+
+      api.call(self, opts, done);
+    }, callback);
+  });
+};
+
+//
 // ### @private function request (options, callback)
-// #### @options {Object}
+// #### @options {Object} Configuration
 // #### @callback {function} Continuation to call if errors occur.
 // Makes a request to the remoteUri + uri using the HTTP and any body if
 // supplied.
@@ -188,4 +261,3 @@ var failCodes = {
   500: 'Internal Server Error',
   503: 'Service Unavailable'
 };
-
