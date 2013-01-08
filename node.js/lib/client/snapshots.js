@@ -54,9 +54,7 @@ Snapshots.prototype.create = function (appName, snapshotName, filename, callback
   appName = defaultUser.call(this, appName);
   var argv = ['apps'].concat(appName.split('/')).concat(['snapshots', snapshotName]);
 
-  return this.upload(argv, 'application/octet-stream', filename, callback, function (res, body) {
-    callback(null, body || res.statusCode);
-  });
+  return this.upload({ uri: argv, file: filename }, callback);
 };
 
 //

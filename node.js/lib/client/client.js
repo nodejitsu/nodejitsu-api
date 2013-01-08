@@ -45,6 +45,7 @@ util.inherits(Client, EventEmitter);
 // - remoteUri {String}: Location of the remote API
 // - timeout {Number}: Request timeout
 // - body {Array|Object}: JSON request body
+// - headers {Object}: Headers you want to set
 //
 Client.prototype.request = function (options, callback) {
   options = options || {};
@@ -68,9 +69,13 @@ Client.prototype.request = function (options, callback) {
   if (options.body) {
     try { opts.body = JSON.stringify(options.body); }
     catch (e) { return callback(e); }
-  } else if (opts.method !== 'GET') {
+  } else if (opts.method !== 'GET' && options.body !== false) {
     opts.body = '{}';
   }
+
+  if (options.headers) Object.keys(options.headers).forEach(function each(field) {
+    opts.headers[field] = options.headers[field];
+  });
 
   if (proxy) opts.proxy = proxy;
 
@@ -107,90 +112,66 @@ Client.prototype.request = function (options, callback) {
 };
 
 //
-// ### function upload (uri, contentType, file, callback, success)
-// #### @uri {Array} Locator for the Remote Resource
-// #### @contentType {string} Content-Type header to use for the upload.
-// #### @file {string} Path of the local file to upload.
-// #### @success {function} Continuation to call upon successful transactions
+// ### @private function upload (options, callback)
+// #### @options {Object}
 // #### @callback {function} Continuation to call if errors occur.
-// Makes a `POST` request to `this.remoteUri + uri` with the data in `file`
-// as the request body. Short circuits to `callback` if the response
-// code from Nodejitsu matches `failCodes`.
+// Makes a POST request to the remoteUri + uri using the HTTP and any body if
+// supplied. It defers the call the private request method.
 //
-Client.prototype.upload = function (uri, contentType, file, callback, success) {
-  var self = this,
-      options,
-      out,
-      encoded,
-      emitter = new EventEmitter(),
-      proxy = self.options.get('proxy'),
-      token = this.options.get('password') || this.options.get('api-token'),
-      encoded = new Buffer(this.options.get('username') + ':' + token).toString('base64');
+// Options:
+// - uri {Array}: Locator for the remote resource
+// - remoteUri {String}: Location of the remote API
+// - timeout {Number}: Request timeout
+// - file: {String} path to the file you want to upload
+//
+Client.prototype.upload = function (options, callback) {
+  options = options || {};
 
-  fs.stat(file, function (err, stat) {
-    if (err) {
-      return callback(err);
-    }
+  var progress = new EventEmitter(),
+      self = this;
 
-    emitter.emit('start', stat);
+  fs.stat(options.file, function fstat(err, stat) {
+    if (err) return callback(err);
 
-    options = {
-      method: 'POST',
-      uri: self.options.get('remoteUri') + '/' + uri.join('/'),
-      headers: {
-        'Authorization': 'Basic ' + encoded,
-        'Content-Type': contentType,
-        'Content-Length': stat.size
-      },
-      timeout: self.options.get('timeout') || 8 * 60 * 1000
-    };
+    var size = stat.size;
 
-    if(proxy) {
-      options.proxy = proxy;
-    }
+    // Set the correct headers
+    if (!options.headers) options.headers = {};
+    options.headers['Content-Length'] = size;
+    options.headers['Content-Type'] = options.contentType || 'application/octet-stream';
 
-    out = self._request(options, function (err, response, body) {
-      if (err) {
-        return callback(err);
-      }
+    // And other default options to do a successful post
+    if (!options.method) options.method = 'POST';
+    options.body = false;
 
-      var statusCode, result, error;
+    // Defer all the error handling to the request method
+    var req = self.request(options, callback);
+    if (!req) return;
 
-      try {
-        statusCode = response.statusCode;
-        result = JSON.parse(body);
-      }
-      catch (ex) {
-        // Ignore Errors
-      }
-      if (failCodes[statusCode]) {
-        error = new Error('Nodejitsu Error (' + statusCode + '): ' + failCodes[statusCode]);
-        error.result = result;
-        return callback(error);
-      }
+    req.once('request', function requested(request) {
+      request.once('socket', function data(socket) {
+        var buffer = 0;
 
-      success(response, result);
-    });
-
-    out.on('request', function(request) {
-      var buffer = 0;
-      request.on('socket', function(socket) {
-        var id = setInterval(function() {
+        var interval = setInterval(function polling() {
           var data = socket._bytesDispatched || (socket.socket && socket.socket._bytesDispatched);
-          emitter.emit('data', data - buffer);
-          buffer = data;
-          if(buffer >= stat.size) {
-            clearInterval(id);
-            emitter.emit('end');
+
+          if (data) {
+            progress.emit('data', data - buffer);
+            buffer = data;
           }
-        },100);
+
+          if (buffer >= size) {
+            clearInterval(interval);
+            progress.emit('end');
+          }
+        }, 100);
       });
     });
 
-    fs.createReadStream(file).pipe(out);
+    fs.createReadStream(options.file).pipe(req);
   });
 
-  return emitter;
+  return progress;
 };
 
 var failCodes = {
