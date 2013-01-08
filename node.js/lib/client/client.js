@@ -148,6 +148,10 @@ Client.prototype.upload = function (options, callback) {
     var req = self.request(options, callback);
     if (!req) return;
 
+    // Notify that we have started the upload procedure and give it a reference
+    // to the stat.
+    progress.emit('start', stat);
+
     req.once('request', function requested(request) {
       request.once('socket', function data(socket) {
         var buffer = 0;
