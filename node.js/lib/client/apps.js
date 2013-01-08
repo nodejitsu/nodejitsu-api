@@ -35,10 +35,23 @@ Apps.prototype.list = function (username, callback) {
     username = this.options.get('username');
   }
 
+  var self = this;
+
   this.request({ uri: ['apps', username] }, function (err, result, res) {
     if (err) return callback(err);
 
     callback(err, result.apps);
+
+    //
+    // Cache the lookups so we know which datacenters belong to the apps.
+    //
+    if (username === self.options.get('username')) {
+      result.apps.forEach(function reduce(memo, app) {
+        if (app.config) {
+          self.cloud[app._id] = app.config.cloud;
+        }
+      });
+    }
   });
 };
 
@@ -62,12 +75,21 @@ Apps.prototype.create = function (app, callback) {
 //
 Apps.prototype.view = function (appName, callback) {
   appName = defaultUser.call(this, appName);
-  var argv = ['apps'].concat(appName.split('/'));
+  var argv = ['apps'].concat(appName.split('/')),
+      self = this;
 
-  this.request({ uri: argv }, function (err, result, res) {
+  this.request({ uri: argv }, function (err, result) {
     if (err) return callback(err);
 
-    callback(err, result.app);
+    var app = result.app;
+    callback(err, app);
+
+    //
+    // Update the cloud cache.
+    //
+    if (app.config) {
+      self.clouds[appName] = app.config.cloud;
+    }
   });
 };
 
@@ -174,11 +196,21 @@ Apps.prototype.setDrones = function (appName, drones, callback) {
 //
 Apps.prototype.datacenter = function (appName, cloud, callback) {
   appName = defaultUser.call(this, appName);
-  var argv = ['apps'].concat(appName.split('/')).concat('cloud');
+  var argv = ['apps'].concat(appName.split('/')).concat('cloud'),
+      self = this;
 
   if (!Array.isArray(cloud)) cloud = [cloud];
 
-  this.request({ method: 'POST', uri: argv, body: cloud }, callback);
+  this.request({ method: 'POST', uri: argv, body: cloud }, function (err, result) {
+    if (err) return callback(err);
+
+    callback(err, result);
+
+    //
+    // Assume that this call invalidates our cached datacenter endpoint
+    //
+    delete self.clouds[appName];
+  });
 };
 
 //
@@ -187,9 +219,11 @@ Apps.prototype.datacenter = function (appName, cloud, callback) {
 // Retrieves a list of currenlty active datacenters and providers
 //
 Apps.prototype.endpoints = function (callback) {
+  var self = this;
   this.request({ uri: ['endpoints'] }, function (err, result) {
     if (err) return callback(err);
 
+    self.datacenters = result.endpoints;
     callback(err, result.endpoints);
   });
 };

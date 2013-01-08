@@ -30,7 +30,6 @@ var Client = exports.Client = function (options) {
       return this[key];
     };
   }
-
 };
 
 util.inherits(Client, EventEmitter);
