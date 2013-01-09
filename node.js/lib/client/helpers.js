@@ -62,7 +62,7 @@ exports.async = {
     arr.forEach(function loop(something, index) {
       iterator(something, function completion(err, value) {
         if (err) {
-          callback(err);
+          callback(err, results);
           return callback = noop;
         }
 

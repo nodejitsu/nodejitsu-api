@@ -47,38 +47,42 @@ Client.prototype.cloud = function (options, api, callback) {
       flow = [];
 
   // We don't need to have any datacenter information for these types of calls
-  if (options.remoteUri || !options.app || !options.method || options.method === 'GET') {
+  if (options.remoteUri || !options.appName || !options.method || options.method === 'GET') {
     return api.call(this, options, callback);
   }
 
-  //
-  // We don't have any datacenter data by default as it's only needed for
-  // starting or stopping the application.
-  //
-  if (!Object.keys(this.datacenters).length) flow.push(function (done) {
+  function endpoints(done) {
     self.request({ uri: ['endpoints'] }, function endpoints(err, datacenters) {
       if (err) return done(err);
 
       self.datacenters = datacenters.endpoints;
       done();
     });
-  });
+  }
 
-  //
-  // Make sure that we have this app in our cloud cache so we know in which
-  // datacenter it is.
-  //
-  if (!(options.app in this.clouds)) flow.push(function (done) {
-    var argv = ['apps', options.app, 'cloud'];
+  function locations(done) {
+    var argv = ['apps', options.appName, 'cloud'];
 
     self.request({ uri: argv }, function apps(err, result) {
       if (err) return done(err);
 
       // For some odd reason, the result is an array of arrays.
-      self.clouds[options.app] = result[0];
+      self.clouds[options.appName] = result[0];
       done();
     });
-  });
+  }
+
+  //
+  // We don't have any datacenter data by default as it's only needed for
+  // starting or stopping the application.
+  //
+  if (!Object.keys(this.datacenters).length) flow.push(endpoints);
+
+  //
+  // Make sure that we have this app in our cloud cache so we know in which
+  // datacenter it is.
+  //
+  if (!(options.appName in this.clouds)) flow.push(locations);
 
   //
   // Iterate over the possible steps.
@@ -87,7 +91,7 @@ Client.prototype.cloud = function (options, api, callback) {
     if (err) return callback(err);
 
     // The returned clouds is an array of datacenters, iterate over them.
-    async.map(self.clouds[options.app], function iterate(cloud, done) {
+    async.map(self.clouds[options.appName], function iterate(cloud, done) {
       //
       // Clone the options to prevent race conditions.
       //
@@ -100,7 +104,15 @@ Client.prototype.cloud = function (options, api, callback) {
       if (!~opts.remoteUri.indexOf('http')) opts.remoteUri = 'http://'+ opts.remoteUri;
 
       api.call(self, opts, done);
-    }, callback);
+    }, function ready(err, results) {
+      if (err) delete self.clouds[options.appName];
+      callback(err, results);
+
+      //
+      // We probably want to figure out which calls went okay, and which one
+      // failed when we get an error so we only have to retry that one.
+      //
+    });
   });
 };
 

@@ -117,7 +117,7 @@ Apps.prototype.destroy = function (appName, callback) {
   appName = defaultUser.call(this, appName);
   var argv = ['apps'].concat(appName.split('/'));
 
-  this.request({ method: 'DELETE', uri: argv }, callback);
+  this.cloud({ method: 'DELETE', uri: argv, appName: appName }, this.request, callback);
 };
 
 //
@@ -130,7 +130,7 @@ Apps.prototype.start = function (appName, callback) {
   appName = defaultUser.call(this, appName);
   var argv = ['apps'].concat(appName.split('/')).concat('start');
 
-  this.request({ method: 'POST', uri: argv }, callback);
+  this.cloud({ method: 'POST', uri: argv, appName: appName }, this.request, callback);
 };
 
 //
@@ -143,7 +143,7 @@ Apps.prototype.restart = function (appName, callback) {
   appName = defaultUser.call(this, appName);
   var argv = ['apps'].concat(appName.split('/')).concat('restart');
 
-  this.cloud({ method: 'POST', uri: argv, app: appName }, this.request, callback);
+  this.cloud({ method: 'POST', uri: argv, appName: appName }, this.request, callback);
 };
 
 //
@@ -156,7 +156,7 @@ Apps.prototype.stop = function (appName, callback) {
   appName = defaultUser.call(this, appName);
   var argv = ['apps'].concat(appName.split('/')).concat('stop');
 
-  this.request({ method: 'POST', uri: argv }, callback);
+  this.cloud({ method: 'POST', uri: argv, appName: appName }, this.request, callback);
 };
 
 //
@@ -182,9 +182,10 @@ Apps.prototype.available = function (app, callback) {
 //
 Apps.prototype.setDrones = function (appName, drones, callback) {
   appName = defaultUser.call(this, appName);
-  var argv = ['apps'].concat(appName.split('/')).concat('cloud');
+  var argv = ['apps'].concat(appName.split('/')).concat('cloud'),
+      cloud = [{ drones: drones }];
 
-  this.request({ method: 'POST', uri: argv, body: [{ drones: drones }] }, callback);
+  this.cloud({ method: 'POST', uri: argv, body: cloud, appName: appName }, this.request, callback);
 };
 
 //
@@ -201,7 +202,7 @@ Apps.prototype.datacenter = function (appName, cloud, callback) {
 
   if (!Array.isArray(cloud)) cloud = [cloud];
 
-  this.request({ method: 'POST', uri: argv, body: cloud }, function (err, result) {
+  this.cloud({ method: 'POST', uri: argv, body: cloud, appName: appName }, this.request, function (err, result) {
     if (err) return callback(err);
 
     callback(err, result);
@@ -220,6 +221,7 @@ Apps.prototype.datacenter = function (appName, cloud, callback) {
 //
 Apps.prototype.endpoints = function (callback) {
   var self = this;
+
   this.request({ uri: ['endpoints'] }, function (err, result) {
     if (err) return callback(err);
 
