@@ -48,7 +48,7 @@ Apps.prototype.list = function (username, callback) {
     if (username === self.options.get('username')) {
       result.apps.forEach(function reduce(memo, app) {
         if (app.config) {
-          self.cloud[app._id] = app.config.cloud;
+          self.clouds[app._id] = app.config.cloud;
         }
       });
     }
@@ -117,7 +117,7 @@ Apps.prototype.destroy = function (appName, callback) {
   appName = defaultUser.call(this, appName);
   var argv = ['apps'].concat(appName.split('/'));
 
-  this.cloud({ method: 'DELETE', uri: argv, appName: appName }, this.request, callback);
+  this.request({ method: 'DELETE', uri: argv, appName: appName }, callback);
 };
 
 //
