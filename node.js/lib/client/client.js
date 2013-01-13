@@ -66,8 +66,7 @@ Client.prototype.cloud = function (options, api, callback) {
     self.request({ uri: argv }, function apps(err, result) {
       if (err) return done(err);
 
-      // For some odd reason, the result is an array of arrays.
-      self.clouds[options.appName] = result[0];
+      self.clouds[options.appName] = result;
       done();
     });
   }
