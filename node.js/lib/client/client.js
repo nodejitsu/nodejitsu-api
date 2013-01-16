@@ -51,6 +51,9 @@ Client.prototype.cloud = function (options, api, callback) {
     return api.call(this, options, callback);
   }
 
+  //
+  // Fetches the API endpoints
+  //
   function endpoints(done) {
     self.request({ uri: ['endpoints'] }, function endpoints(err, datacenters) {
       if (err) return done(err);
@@ -60,6 +63,9 @@ Client.prototype.cloud = function (options, api, callback) {
     });
   }
 
+  //
+  // Fetches the datacenter locations for the app
+  //
   function locations(done) {
     var argv = ['apps', options.appName, 'cloud'];
 
@@ -100,7 +106,7 @@ Client.prototype.cloud = function (options, api, callback) {
       }, {});
 
       opts.remoteUri = self.datacenters[cloud.provider][cloud.datacenter];
-      if (!~opts.remoteUri.indexOf('http')) opts.remoteUri = 'http://'+ opts.remoteUri;
+      if (!~opts.remoteUri.indexOf('http')) opts.remoteUri = 'https://'+ opts.remoteUri;
 
       api.call(self, opts, done);
     }, function ready(err, results) {
@@ -189,7 +195,6 @@ Client.prototype.request = function (options, callback) {
 
     // Only add the response argument when people ask for it
     if (callback.length === 3) return callback(error, result, res);
-
     callback(error, result);
   });
 };

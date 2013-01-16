@@ -47,8 +47,8 @@ Apps.prototype.list = function (username, callback) {
     //
     if (username === self.options.get('username')) {
       result.apps.forEach(function reduce(memo, app) {
-        if (app.config) {
-          self.clouds[app._id] = app.config.cloud;
+        if (app.config && app.config.cloud) {
+          self.clouds[app._id] = app.cloud;
         }
       });
     }
@@ -87,7 +87,7 @@ Apps.prototype.view = function (appName, callback) {
     //
     // Update the cloud cache.
     //
-    if (app.config) {
+    if (app.config && app.config.cloud) {
       self.clouds[appName] = app.config.cloud;
     }
   });
@@ -202,15 +202,22 @@ Apps.prototype.datacenter = function (appName, cloud, callback) {
 
   if (!Array.isArray(cloud)) cloud = [cloud];
 
+  //
+  // As this API request needs to go to the correct datacenter, add the current
+  // cloud call to our internal datacenter cache so it will target the correct
+  // API
+  //
+  this.clouds[appName] = cloud;
+
   this.cloud({ method: 'POST', uri: argv, body: cloud, appName: appName }, this.request, function (err, result) {
-    if (err) return callback(err);
-
-    callback(err, result);
-
     //
-    // Assume that this call invalidates our cached datacenter endpoint
+    // Assume that this call invalidates our cached datacenter endpoint, so
+    // remove it, and it will be fetched again on the next call
     //
     delete self.clouds[appName];
+
+    if (err) return callback(err);
+    callback(err, result);
   });
 };
 
