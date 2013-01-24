@@ -3,6 +3,15 @@ var vows = require('vows'),
     nock = require('nock'),
     makeApiCall = require('../macros').makeApiCall;
 
+var cloud = [{ drones: 0, provider: 'jitsu', datacenter: 'foobar' }],
+    endpoints = {
+      "endpoints": {
+        "jitsu": {
+          "foobar": "api.mockjitsu.com"
+        }
+      }
+    };
+
 vows.describe('apps').addBatch(makeApiCall(
   'apps list',
   function setup () {
@@ -70,6 +79,10 @@ vows.describe('apps').addBatch(makeApiCall(
     nock('https://api.mockjitsu.com')
       .post('/apps/tester/myApp/start', {})
       .reply(200, {}, { 'x-powered-by': 'Nodejitsu' })
+      .get('/endpoints')
+      .reply(200, endpoints, { 'x-powered-by': 'Nodejitsu' })
+      .get('/apps/tester/myApp/cloud')
+      .reply(200, cloud, { 'x-powered-by': 'Nodejitsu' })
   }
 )).addBatch(makeApiCall(
   'apps restart myApp',
