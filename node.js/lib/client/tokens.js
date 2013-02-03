@@ -44,10 +44,17 @@ Tokens.prototype.list = function (username, callback) {
 // Creates a new token with the properties specified by `tokenID` if provided.
 //
 Tokens.prototype.create = function (username, tokenID, callback) {
-  if(arguments.length === 2) {
-    callback = token;
+  if(arguments.length === 1) {
+    callback = username;
     tokenID = null;
+    username = this.options.get('username');
   }
+  if(arguments.length === 2) {
+    callback = tokenID;
+    tokenID = username;
+    username = this.options.get('username');
+  }
+
   if(tokenID !== null){
     this.request('PUT', ['users', username, 'tokens', tokenID], callback, function (res, result) {
       callback(null, result);
@@ -66,8 +73,13 @@ Tokens.prototype.create = function (username, tokenID, callback) {
 // #### @callback {function} Continuation to pass control to when complete
 // Destroys a token with the id specified by `token`.
 //
-Tokens.prototype.destroy = function (username, token, callback) {
-  this.request('DELETE', ['users', username, 'tokens', token], callback, function (res, result) {
+Tokens.prototype.destroy = function (username, tokenID, callback) {
+  if(arguments.length === 2) {
+    callback = tokenID;
+    tokenID = username;
+    username = this.options.get('username');
+  }
+  this.request('DELETE', ['users', username, 'tokens', tokenID], callback, function (res, result) {
     callback(null, result);
   });
 };
