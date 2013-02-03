@@ -1,4 +1,4 @@
-var parts = ['Apps', 'Users', 'Keys', 'Snapshots', 'Databases', 'Logs', 'Client'];
+var parts = ['Apps', 'Users', 'Keys', 'Tokens', 'Snapshots', 'Databases', 'Logs', 'Client'];
 
 parts.forEach(function (k) {
   exports[k] = require('./client/' + k.toLowerCase())[k];
