@@ -109,16 +109,24 @@ Client.prototype.cloud = function (options, api, callback) {
         return memo;
       }, {});
 
+      if (!self.datacenters || !self.datacenters[cloud.provider]
+          || self.datacenters[cloud.provider][cloud.datacenter]) {
+        return done(new Error('Unknown cloud: ' + cloud.provider + ' ' + cloud.datacenter));
+      }
+
       opts.remoteUri = self.datacenters[cloud.provider][cloud.datacenter];
       if (!~opts.remoteUri.indexOf('http')) opts.remoteUri = 'https://'+ opts.remoteUri;
 
       api.call(self, opts, done);
     }, function ready(err, results) {
-      if (err) delete self.clouds[options.appName];
+      if (err) {
+        delete self.clouds[options.appName];
+        return callback(err);
+      }
 
       return results.length === 1
-        ? callback(err, results[0])
-        : callback(err, results)
+        ? callback(null, results[0])
+        : callback(null, results)
 
       //
       // We probably want to figure out which calls went okay, and which one
