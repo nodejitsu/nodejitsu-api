@@ -35,6 +35,22 @@ var Client = exports.Client = function (options) {
 util.inherits(Client, EventEmitter);
 
 //
+// ### function endpoints(callback)
+// #### @callback {function} Continuation to respond to when complete.
+// Retrieves a list of currenlty active datacenters and providers
+//
+Client.prototype.endpoints = function (callback) {
+  var self = this;
+
+  this.request({ uri: ['endpoints'] }, function (err, result) {
+    if (err) return callback(err);
+
+    self.datacenters = result.endpoints;
+    callback(err, result.endpoints);
+  });
+};
+
+//
 // ### @private function cloud (options, api, callback)
 // #### @options {Object} Configuration
 // #### @api {Function} Private API that needs to be called, request / upload
@@ -49,18 +65,6 @@ Client.prototype.cloud = function (options, api, callback) {
   // We don't need to have any datacenter information for these types of calls
   if (options.remoteUri || !options.appName || !options.method || options.method === 'GET') {
     return api.call(this, options, callback);
-  }
-
-  //
-  // Fetches the API endpoints
-  //
-  function endpoints(done) {
-    self.request({ uri: ['endpoints'] }, function endpoints(err, datacenters) {
-      if (err) return done(err);
-
-      self.datacenters = datacenters.endpoints;
-      done();
-    });
   }
 
   //
@@ -81,7 +85,7 @@ Client.prototype.cloud = function (options, api, callback) {
   // We don't have any datacenter data by default as it's only needed for
   // starting or stopping the application.
   //
-  if (!Object.keys(this.datacenters).length) flow.push(endpoints);
+  if (!Object.keys(this.datacenters).length) flow.push(this.endpoints.bind(this));
 
   //
   // Make sure that we have this app in our cloud cache so we know in which

@@ -220,19 +220,3 @@ Apps.prototype.datacenter = function (appName, cloud, callback) {
     callback(err, result);
   });
 };
-
-//
-// ### function endpoints(callback)
-// #### @callback {function} Continuation to respond to when complete.
-// Retrieves a list of currenlty active datacenters and providers
-//
-Apps.prototype.endpoints = function (callback) {
-  var self = this;
-
-  this.request({ uri: ['endpoints'] }, function (err, result) {
-    if (err) return callback(err);
-
-    self.datacenters = result.endpoints;
-    callback(err, result.endpoints);
-  });
-};
