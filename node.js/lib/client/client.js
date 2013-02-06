@@ -110,7 +110,7 @@ Client.prototype.cloud = function (options, api, callback) {
       }, {});
 
       if (!self.datacenters || !self.datacenters[cloud.provider]
-          || self.datacenters[cloud.provider][cloud.datacenter]) {
+          || !self.datacenters[cloud.provider][cloud.datacenter]) {
         return done(new Error('Unknown cloud: ' + cloud.provider + ' ' + cloud.datacenter));
       }
 
