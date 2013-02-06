@@ -115,7 +115,10 @@ Client.prototype.cloud = function (options, api, callback) {
       api.call(self, opts, done);
     }, function ready(err, results) {
       if (err) delete self.clouds[options.appName];
-      callback(err, results);
+
+      return results.length === 1
+        ? callback(err, results[0])
+        : callback(err, results)
 
       //
       // We probably want to figure out which calls went okay, and which one
