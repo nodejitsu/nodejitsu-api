@@ -47,7 +47,8 @@ Client.prototype.request = function (method, uri /* variable arguments */) {
       success = args.pop(),
       callback = args.pop(),
       body = typeof args[args.length - 1] === 'object' && !Array.isArray(args[args.length - 1]) && args.pop(),
-      encoded = new Buffer(this.options.get('username') + ':' + this.options.get('password')).toString('base64'),
+      token = this.options.get('password') || this.options.get('api-token'),
+      encoded = new Buffer(this.options.get('username') + ':' + token).toString('base64'),
       proxy = this.options.get('proxy');
 
   options = {
@@ -128,9 +129,9 @@ Client.prototype.upload = function (uri, contentType, file, callback, success) {
       out,
       encoded,
       emitter = new EventEmitter(),
-      proxy = self.options.get('proxy');
-
-  encoded = new Buffer(this.options.get('username') + ':' + this.options.get('password')).toString('base64');
+      proxy = self.options.get('proxy'),
+      token = this.options.get('password') || this.options.get('api-token'),
+      encoded = new Buffer(this.options.get('username') + ':' + token).toString('base64');
 
   fs.stat(file, function (err, stat) {
     if (err) {
