@@ -1,14 +1,16 @@
+'use strict';
+
 /*
  * tokens.js: Client for the Nodejitsu Tokens API.
  *
  * (C) 2013, Nodejitsu Inc.
  *
  */
- 
+
 var util = require('util'),
     Client = require('./client').Client,
     defaultUser = require('./helpers').defaultUser;
-    
+
 //
 // ### function Tokens (options)
 // #### @options {Object} Options for this instance
@@ -32,9 +34,8 @@ Tokens.prototype.list = function (username, callback) {
     callback = username;
     username = this.options.get('username');
   }
-  this.request('GET', ['users', username, 'tokens'], callback, function (res, result) {
-    callback(null, result);
-  });
+
+  this.request({ uri: ['users', username, 'tokens'] }, callback);
 };
 
 //
@@ -49,6 +50,7 @@ Tokens.prototype.create = function (username, tokenID, callback) {
     tokenID = null;
     username = this.options.get('username');
   }
+
   if(arguments.length === 2) {
     callback = tokenID;
     tokenID = username;
@@ -56,13 +58,9 @@ Tokens.prototype.create = function (username, tokenID, callback) {
   }
 
   if(tokenID !== null){
-    this.request('PUT', ['users', username, 'tokens', tokenID], callback, function (res, result) {
-      callback(null, result);
-    });
+    this.request({ method: 'PUT', uri: ['users', username, 'tokens', tokenID] }, callback);
   } else {
-    this.request('POST', ['users', username, 'tokens'], callback, function (res, result) {
-      callback(null, result);
-    });
+    this.request({ method: 'POST', uri: ['users', username, 'tokens'] }, callback);
   }
 };
 
@@ -79,9 +77,6 @@ Tokens.prototype.destroy = function (username, tokenID, callback) {
     tokenID = username;
     username = this.options.get('username');
   }
-  this.request('DELETE', ['users', username, 'tokens', tokenID], callback, function (res, result) {
-    callback(null, result);
-  });
+
+  this.request({ method: 'DELETE', uri: ['users', username, 'tokens', tokenID] }, callback);
 };
-
-
