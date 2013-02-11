@@ -1,3 +1,5 @@
+'use strict';
+
 /*
  * client.js: Client base for the Nodejitsu API clients.
  *
@@ -6,10 +8,10 @@
  */
 
 var fs = require('fs'),
-    request = require('request'),
     util = require('util'),
-    EventEmitter = require('events').EventEmitter,
-    Client = require('./client').Client;
+    request = require('request'),
+    async = require('./helpers').async,
+    EventEmitter = require('events').EventEmitter;
 
 //
 // ### function Client (options)
@@ -18,6 +20,8 @@ var fs = require('fs'),
 // for communicating with Nodejitsu's API
 //
 var Client = exports.Client = function (options) {
+  this.clouds = {};
+  this.datacenters = {};
   this.options = options;
   this._request = request;
 
@@ -26,177 +30,255 @@ var Client = exports.Client = function (options) {
       return this[key];
     };
   }
-
 };
 
 util.inherits(Client, EventEmitter);
 
 //
-// ### @private function request (method, uri, [body], success, callback)
-// #### @method {string} HTTP method to use
-// #### @uri {Array} Locator for the Remote Resource
-// #### @body {Object} **optional** JSON Request Body
-// #### @callback {function} Continuation to call if errors occur.
-// #### @success {function} Continuation to call upon successful transactions
-// Makes a request to `this.remoteUri + uri` using `method` and any
-// `body` (JSON-only) if supplied. Short circuits to `callback` if the response
-// code from Nodejitsu matches `failCodes`.
+// ### function endpoints(callback)
+// #### @callback {function} Continuation to respond to when complete.
+// Retrieves a list of currenlty active datacenters and providers
 //
-Client.prototype.request = function (method, uri /* variable arguments */) {
-  var options, args = Array.prototype.slice.call(arguments),
-      success = args.pop(),
-      callback = args.pop(),
-      body = typeof args[args.length - 1] === 'object' && !Array.isArray(args[args.length - 1]) && args.pop(),
-      token = this.options.get('password') || this.options.get('api-token'),
-      encoded = new Buffer(this.options.get('username') + ':' + token).toString('base64'),
-      proxy = this.options.get('proxy');
-
-  options = {
-    method: method || 'GET',
-    uri: this.options.get('remoteUri') + '/' + uri.join('/'),
-    headers: {
-      'Authorization': 'Basic ' + encoded,
-      'Content-Type': 'application/json'
-    },
-    timeout: this.options.get('timeout') || 8 * 60 * 1000
-  };
-
-  if (body) {
-    options.body = JSON.stringify(body);
-  }
-  else if (method !== 'GET') {
-    options.body = '{}';
-  }
-
-  if (proxy) {
-    options.proxy = proxy;
-  }
-
+Client.prototype.endpoints = function (callback) {
   var self = this;
 
-  self.emit('debug::request', options);
+  this.request({ uri: ['endpoints'] }, function (err, result) {
+    if (err) return callback(err);
 
-  return this._request(options, function (err, response, body) {
-    if (err) {
-      return callback(err);
-    }
-
-    var statusCode, result, error;
-
-    try {
-      statusCode = response.statusCode;
-      result = JSON.parse(body);
-    }
-    catch (ex) {
-      // Ignore Errors
-    }
-
-    self.emit('debug::response', { statusCode: statusCode, result: result });
-
-    var poweredBy = response.headers['x-powered-by'];
-    if (!self.options.get('ignorePoweredBy') && !poweredBy || poweredBy.indexOf('Nodejitsu') === -1) {
-      error = new Error('The Nodejitsu-API requires you to connect the Nodejitsu\'s stack (api.nodejitsu.com)');
-      error.statusCode = 403;
-      error.result = "";
-      return callback(error);
-    }
-
-    if (failCodes[statusCode]) {
-      error = new Error('Nodejitsu Error (' + statusCode + '): ' + failCodes[statusCode]);
-      error.statusCode = statusCode;
-      error.result = result;
-      return callback(error);
-    }
-
-    success(response, result);
+    self.datacenters = result.endpoints;
+    callback(err, result.endpoints);
   });
 };
 
 //
-// ### function upload (uri, contentType, file, callback, success)
-// #### @uri {Array} Locator for the Remote Resource
-// #### @contentType {string} Content-Type header to use for the upload.
-// #### @file {string} Path of the local file to upload.
-// #### @success {function} Continuation to call upon successful transactions
-// #### @callback {function} Continuation to call if errors occur.
-// Makes a `POST` request to `this.remoteUri + uri` with the data in `file`
-// as the request body. Short circuits to `callback` if the response
-// code from Nodejitsu matches `failCodes`.
+// ### @private function cloud (options, api, callback)
+// #### @options {Object} Configuration
+// #### @api {Function} Private API that needs to be called, request / upload
+// #### @callback {Function} Continuation
+// Transforms the given API in to a cloud aware method assigning it to the
+// correct datacenter.
 //
-Client.prototype.upload = function (uri, contentType, file, callback, success) {
+Client.prototype.cloud = function (options, api, callback) {
   var self = this,
-      options,
-      out,
-      encoded,
-      emitter = new EventEmitter(),
-      proxy = self.options.get('proxy'),
-      token = this.options.get('password') || this.options.get('api-token'),
-      encoded = new Buffer(this.options.get('username') + ':' + token).toString('base64');
+      flow = [];
 
-  fs.stat(file, function (err, stat) {
-    if (err) {
-      return callback(err);
-    }
+  // We don't need to have any datacenter information for these types of calls
+  if (options.remoteUri || !options.appName || !options.method || options.method === 'GET') {
+    return api.call(this, options, callback);
+  }
 
-    emitter.emit('start', stat);
+  //
+  // Fetches the datacenter locations for the app
+  //
+  function locations(done) {
+    var argv = ['apps', options.appName, 'cloud'];
 
-    options = {
-      method: 'POST',
-      uri: self.options.get('remoteUri') + '/' + uri.join('/'),
-      headers: {
-        'Authorization': 'Basic ' + encoded,
-        'Content-Type': contentType,
-        'Content-Length': stat.size
-      },
-      timeout: self.options.get('timeout') || 8 * 60 * 1000
-    };
+    self.request({ uri: argv }, function apps(err, result) {
+      if (err) return done(err);
 
-    if(proxy) {
-      options.proxy = proxy;
-    }
+      self.clouds[options.appName] = result;
+      done();
+    });
+  }
 
-    out = self._request(options, function (err, response, body) {
+  //
+  // We don't have any datacenter data by default as it's only needed for
+  // starting or stopping the application.
+  //
+  if (!Object.keys(this.datacenters).length) flow.push(this.endpoints.bind(this));
+
+  //
+  // Make sure that we have this app in our cloud cache so we know in which
+  // datacenter it is.
+  //
+  if (!(options.appName in this.clouds)) flow.push(locations);
+
+  //
+  // Iterate over the possible steps.
+  //
+  async.iterate(flow, function completed(err) {
+    if (err) return callback(err);
+
+    // The returned clouds is an array of datacenters, iterate over them.
+    async.map(self.clouds[options.appName], function iterate(cloud, done) {
+      //
+      // Clone the options to prevent race conditions.
+      //
+      var opts = Object.keys(options).reduce(function clone(memo, field) {
+        memo[field] = options[field];
+        return memo;
+      }, {});
+
+      if (!self.datacenters || !self.datacenters[cloud.provider]
+          || !self.datacenters[cloud.provider][cloud.datacenter]) {
+        return done(new Error('Unknown cloud: ' + cloud.provider + ' ' + cloud.datacenter));
+      }
+
+      opts.remoteUri = self.datacenters[cloud.provider][cloud.datacenter];
+      if (!~opts.remoteUri.indexOf('http')) opts.remoteUri = 'https://'+ opts.remoteUri;
+
+      api.call(self, opts, done);
+    }, function ready(err, results) {
       if (err) {
+        delete self.clouds[options.appName];
         return callback(err);
       }
 
-      var statusCode, result, error;
+      return results.length === 1
+        ? callback(null, results[0])
+        : callback(null, results)
 
-      try {
-        statusCode = response.statusCode;
-        result = JSON.parse(body);
-      }
-      catch (ex) {
-        // Ignore Errors
-      }
-      if (failCodes[statusCode]) {
-        error = new Error('Nodejitsu Error (' + statusCode + '): ' + failCodes[statusCode]);
-        error.result = result;
-        return callback(error);
-      }
-
-      success(response, result);
+      //
+      // We probably want to figure out which calls went okay, and which one
+      // failed when we get an error so we only have to retry that one.
+      //
     });
+  });
+};
 
-    out.on('request', function(request) {
-      var buffer = 0;
-      request.on('socket', function(socket) {
-        var id = setInterval(function() {
+//
+// ### @private function request (options, callback)
+// #### @options {Object} Configuration
+// #### @callback {function} Continuation to call if errors occur.
+// Makes a request to the remoteUri + uri using the HTTP and any body if
+// supplied.
+//
+// Options:
+// - method {String}: HTTP method to use
+// - uri {Array}: Locator for the remote resource
+// - remoteUri {String}: Location of the remote API
+// - timeout {Number}: Request timeout
+// - body {Array|Object}: JSON request body
+// - headers {Object}: Headers you want to set
+//
+Client.prototype.request = function (options, callback) {
+  options = options || {};
+
+  var password = this.options.get('password') || this.options.get('api-token'),
+      auth = new Buffer(this.options.get('username') + ':' + password).toString('base64'),
+      proxy = this.options.get('proxy'),
+      self = this,
+      opts = {};
+
+  opts = {
+    method: options.method || 'GET',
+    uri: (options.remoteUri || this.options.get('remoteUri')) + '/' + options.uri.join('/'),
+    headers: {
+      'Authorization': 'Basic ' + auth,
+      'Content-Type': 'application/json'
+    },
+    timeout: options.timeout || this.options.get('timeout') || 8 * 60 * 1000,
+  };
+
+  if (options.body) {
+    try { opts.body = JSON.stringify(options.body); }
+    catch (e) { return callback(e); }
+  } else if (opts.method !== 'GET' && options.body !== false) {
+    opts.body = '{}';
+  }
+
+  if (options.headers) Object.keys(options.headers).forEach(function each(field) {
+    opts.headers[field] = options.headers[field];
+  });
+
+  if (proxy) opts.proxy = proxy;
+
+  this.emit('debug::request', opts);
+
+  return this._request(opts, function requesting(err, res, body) {
+    if (err) return callback(err);
+
+    var poweredBy = res.headers['x-powered-by'],
+        result, statusCode, error;
+
+    try {
+      statusCode = res.statusCode;
+      result = JSON.parse(body);
+    } catch (e) {}
+
+    self.emit('debug::response', { statusCode: statusCode, result: result });
+
+    if (!self.options.get('ignorePoweredBy') && !poweredBy || !~poweredBy.indexOf('Nodejitsu')) {
+      error = new Error('The Nodejitsu-API requires you to connect the Nodejitsu\'s stack (api.nodejitsu.com)');
+      error.statusCode = 403;
+      error.result = '';
+    } else if (failCodes[statusCode]) {
+      error = new Error('Nodejitsu Error (' + statusCode + '): ' + failCodes[statusCode]);
+      error.statusCode = statusCode;
+      error.result = result;
+    }
+
+    // Only add the response argument when people ask for it
+    if (callback.length === 3) return callback(error, result, res);
+    callback(error, result);
+  });
+};
+
+//
+// ### @private function upload (options, callback)
+// #### @options {Object}
+// #### @callback {function} Continuation to call if errors occur.
+// Makes a POST request to the remoteUri + uri using the HTTP and any body if
+// supplied. It defers the call the private request method.
+//
+// Options:
+// - uri {Array}: Locator for the remote resource
+// - remoteUri {String}: Location of the remote API
+// - timeout {Number}: Request timeout
+// - file: {String} path to the file you want to upload
+//
+Client.prototype.upload = function (options, callback) {
+  options = options || {};
+
+  var progress = new EventEmitter(),
+      self = this;
+
+  fs.stat(options.file, function fstat(err, stat) {
+    if (err) return callback(err);
+
+    var size = stat.size;
+
+    // Set the correct headers
+    if (!options.headers) options.headers = {};
+    options.headers['Content-Length'] = size;
+    options.headers['Content-Type'] = options.contentType || 'application/octet-stream';
+
+    // And other default options to do a successful post
+    if (!options.method) options.method = 'POST';
+    options.body = false;
+
+    // Defer all the error handling to the request method
+    var req = self.request(options, callback);
+    if (!req) return;
+
+    // Notify that we have started the upload procedure and give it a reference
+    // to the stat.
+    progress.emit('start', stat);
+
+    req.once('request', function requested(request) {
+      request.once('socket', function data(socket) {
+        var buffer = 0;
+
+        var interval = setInterval(function polling() {
           var data = socket._bytesDispatched || (socket.socket && socket.socket._bytesDispatched);
-          emitter.emit('data', data - buffer);
-          buffer = data;
-          if(buffer >= stat.size) {
-            clearInterval(id);
-            emitter.emit('end');
+
+          if (data) {
+            progress.emit('data', data - buffer);
+            buffer = data;
           }
-        },100);
+
+          if (buffer >= size) {
+            clearInterval(interval);
+            progress.emit('end');
+          }
+        }, 100);
       });
     });
 
-    fs.createReadStream(file).pipe(out);
+    fs.createReadStream(options.file).pipe(req);
   });
 
-  return emitter;
+  return progress;
 };
 
 var failCodes = {
@@ -209,4 +291,3 @@ var failCodes = {
   500: 'Internal Server Error',
   503: 'Service Unavailable'
 };
-

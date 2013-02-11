@@ -1,3 +1,5 @@
+'use strict';
+
 /*
  * databases.js: Client for the Nodejitsu users API.
  *
@@ -15,7 +17,7 @@ var util = require('util'),
 // with Nodejitsu's Databases API
 //
 var Databases = exports.Databases = function (options) {
-  Client = require('./client').Client;Client.call(this, options);
+  Client.call(this, options);
 };
 
 // Inherit from Client base object
@@ -29,15 +31,13 @@ util.inherits(Databases, Client);
 // Provisions a database for the user
 //
 Databases.prototype.create = function (databaseType, databaseName, callback) {
-  this.request(
-    'POST', 
-    ['databases', this.options.get('username'), databaseName], 
-    { type: databaseType }, 
-    callback, 
-    function (res, result) {
-      callback(null, result.database, res);
-    }
-  );
+  var argv = ['databases', this.options.get('username'), databaseName];
+
+  this.request({ method: 'POST', uri: argv, body: { type: databaseType }}, function (err, result, res) {
+    if (err) return callback(err);
+
+    callback(err, result.database, res);
+  });
 };
 
 //
@@ -47,36 +47,32 @@ Databases.prototype.create = function (databaseType, databaseName, callback) {
 // Gets the metadata for the specified database
 //
 Databases.prototype.get = function (databaseName, callback) {
-  this.request(
-    'GET', 
-    ['databases', this.options.get('username'), databaseName], 
-    callback, 
-    function (res, result) {
-      callback(null, result.database);
-    }
-  );
+  var argv = ['databases', this.options.get('username'), databaseName];
+
+  this.request({ uri: argv }, function (err, result) {
+    if (err) return callback(err);
+
+    callback(null, result.database);
+  });
 };
 
 //
 // ### function list (username, callback)
+// #### @username {String} **optional** Username
 // #### @callback {function} Continuation to pass control to when complete
 // Gets the list of databases assigned to the user
 //
 Databases.prototype.list = function (username, callback) {
-  
   if (arguments.length === 1) {
     callback = username;
     username = this.options.get('username');
   }
-  
-  this.request(
-    'GET', 
-    ['databases', username],
-    callback, 
-    function (res, result) {
-      callback(null, result.databases);
-    }
-  );
+
+  this.request({ uri: ['databases', username] }, function (err, result) {
+    if (err) return callback(err);
+
+    callback(null, result.databases);
+  });
 };
 
 //
@@ -86,12 +82,7 @@ Databases.prototype.list = function (username, callback) {
 // Deprovisions specified database
 //
 Databases.prototype.destroy = function (databaseName, callback) {
-  this.request(
-    'DELETE', 
-    ['databases', this.options.get('username'), databaseName], 
-    callback, 
-    function (res, result) {
-      callback(null, result);
-    }
-  );
-}
+  var argv = ['databases', this.options.get('username'), databaseName];
+
+  this.request({ method: 'DELETE', uri: argv }, callback);
+};

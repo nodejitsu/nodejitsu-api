@@ -1,3 +1,5 @@
+'use strict';
+
 /*
  * app.js: Client for the Nodejitsu apps API.
  *
@@ -33,8 +35,23 @@ Apps.prototype.list = function (username, callback) {
     username = this.options.get('username');
   }
 
-  this.request('GET', ['apps', username], callback, function (res, result) {
-    callback(null, result.apps || res.statusCode);
+  var self = this;
+
+  this.request({ uri: ['apps', username] }, function (err, result, res) {
+    if (err) return callback(err);
+
+    callback(err, result.apps);
+
+    //
+    // Cache the lookups so we know which datacenters belong to the apps.
+    //
+    if (username === self.options.get('username')) {
+      result.apps.forEach(function reduce(memo, app) {
+        if (app.config && app.config.cloud) {
+          self.clouds[app._id] = app.cloud;
+        }
+      });
+    }
   });
 };
 
@@ -47,9 +64,7 @@ Apps.prototype.list = function (username, callback) {
 Apps.prototype.create = function (app, callback) {
   var appName = defaultUser.call(this, app.name);
 
-  this.request('POST', ['apps', appName], app, callback, function (res, result) {
-    callback(null, result || res.statusCode);
-  });
+  this.request({ method: 'POST', uri: ['apps', appName], body: app }, callback);
 };
 
 //
@@ -60,10 +75,21 @@ Apps.prototype.create = function (app, callback) {
 //
 Apps.prototype.view = function (appName, callback) {
   appName = defaultUser.call(this, appName);
-  var argv = ['apps'].concat(appName.split('/'));
+  var argv = ['apps'].concat(appName.split('/')),
+      self = this;
 
-  this.request('GET', argv, callback, function (res, result) {
-    callback(null, result.app || res.statusCode);
+  this.request({ uri: argv }, function (err, result) {
+    if (err) return callback(err);
+
+    var app = result.app;
+    callback(err, app);
+
+    //
+    // Update the cloud cache.
+    //
+    if (app.config && app.config.cloud) {
+      self.clouds[appName] = app.config.cloud;
+    }
   });
 };
 
@@ -78,9 +104,7 @@ Apps.prototype.update = function (appName, attrs, callback) {
   appName = defaultUser.call(this, appName);
   var argv = ['apps'].concat(appName.split('/'));
 
-  this.request('PUT', argv, attrs, callback, function (res, result) {
-    callback(null, result || res.statusCode);
-  });
+  this.request({ method: 'PUT', uri: argv, body: attrs }, callback);
 };
 
 //
@@ -93,24 +117,32 @@ Apps.prototype.destroy = function (appName, callback) {
   appName = defaultUser.call(this, appName);
   var argv = ['apps'].concat(appName.split('/'));
 
-  this.request('DELETE', argv, callback, function (res, result) {
-    callback(null, result || res.statusCode);
-  });
+  this.request({ method: 'DELETE', uri: argv, appName: appName }, callback);
 };
 
 //
 // ### function start (appName, callback)
 // #### @appName {string} Name of the application to start
+// #### @cloud {Object|Array} **Optional** Cloud to start this application in.
 // #### @callback {function} Continuation to pass control to when complete
 // Starts the application with `name` for the authenticated user.
 //
-Apps.prototype.start = function (appName, callback) {
+Apps.prototype.start = function (appName, cloud, callback) {
+  if (!callback && typeof cloud === 'function') {
+    callback = cloud;
+    cloud = null;
+  }
+
   appName = defaultUser.call(this, appName);
   var argv = ['apps'].concat(appName.split('/')).concat('start');
 
-  this.request('POST', argv, callback, function (res, result) {
-    callback(null, result || res.statusCode);
-  });
+  if (cloud) {
+    self.clouds[appName] = !Array.isArray(cloud)
+      ? [cloud]
+      : cloud;
+  }
+
+  this.cloud({ method: 'POST', uri: argv, appName: appName }, this.request, callback);
 };
 
 //
@@ -123,9 +155,7 @@ Apps.prototype.restart = function (appName, callback) {
   appName = defaultUser.call(this, appName);
   var argv = ['apps'].concat(appName.split('/')).concat('restart');
 
-  this.request('POST', argv, callback, function (res, result) {
-    callback(null, result || res.statusCode);
-  });
+  this.cloud({ method: 'POST', uri: argv, appName: appName }, this.request, callback);
 };
 
 //
@@ -138,9 +168,7 @@ Apps.prototype.stop = function (appName, callback) {
   appName = defaultUser.call(this, appName);
   var argv = ['apps'].concat(appName.split('/')).concat('stop');
 
-  this.request('POST', argv, callback, function (res, result) {
-    callback(null, result || res.statusCode);
-  });
+  this.cloud({ method: 'POST', uri: argv, appName: appName }, this.request, callback);
 };
 
 //
@@ -154,9 +182,7 @@ Apps.prototype.available = function (app, callback) {
   var appName = defaultUser.call(this, app.name),
       argv = ['apps'].concat(appName.split('/')).concat('available');
 
-  this.request('POST', argv, app, callback, function (res, result) {
-    callback(null, result || res.statusCode);
-  });
+  this.request({ method: 'POST', uri: argv, body: app }, callback);
 };
 
 //
@@ -168,9 +194,41 @@ Apps.prototype.available = function (app, callback) {
 //
 Apps.prototype.setDrones = function (appName, drones, callback) {
   appName = defaultUser.call(this, appName);
-  var argv = ['apps'].concat(appName.split('/')).concat('drones');
+  var argv = ['apps'].concat(appName.split('/')).concat('cloud'),
+      cloud = [{ drones: drones }];
 
-  this.request('POST', argv, { drones: drones }, callback, function (res, result) {
-    callback(null, result || res.statusCode);
+  this.cloud({ method: 'POST', uri: argv, body: cloud, appName: appName }, this.request, callback);
+};
+
+//
+// ### function datacenter(appName, cloud, callback)
+// #### @appName {String} Name of the application
+// #### @cloud {Object} Cloud specification
+// #### @callback {Function} Continuation to pass control to when complete
+// Deploy the given application in a new datacenter.
+//
+Apps.prototype.datacenter = function (appName, cloud, callback) {
+  appName = defaultUser.call(this, appName);
+  var argv = ['apps'].concat(appName.split('/')).concat('cloud'),
+      self = this;
+
+  if (!Array.isArray(cloud)) cloud = [cloud];
+
+  //
+  // As this API request needs to go to the correct datacenter, add the current
+  // cloud call to our internal datacenter cache so it will target the correct
+  // API
+  //
+  this.clouds[appName] = cloud;
+
+  this.cloud({ method: 'POST', uri: argv, body: cloud, appName: appName }, this.request, function (err, result) {
+    //
+    // Assume that this call invalidates our cached datacenter endpoint, so
+    // remove it, and it will be fetched again on the next call
+    //
+    delete self.clouds[appName];
+
+    if (err) return callback(err);
+    callback(err, result);
   });
 };

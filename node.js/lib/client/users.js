@@ -1,14 +1,16 @@
+'use strict';
+
 /*
  * users.js: Client for the Nodejitsu users API.
  *
  * (C) 2010, Nodejitsu Inc.
  *
  */
- 
+
 var util = require('util'),
     Client = require('./client').Client,
     defaultUser = require('./helpers').defaultUser;
-    
+
 //
 // ### function Users (options)
 // #### @options {Object} Options for this instance
@@ -28,33 +30,30 @@ util.inherits(Users, Client);
 // Tests the authentication of the user identified in this process.
 //
 Users.prototype.auth = function (callback) {
-  this.request('GET', ['auth'], callback, function (res, body) {
-    callback(null, true);
+  this.request({ uri: ['auth'] }, function (err, result) {
+    if (err) return callback(err)
+    callback(err, true);
   });
 };
 
 //
-// ### function create (user, callback) 
+// ### function create (user, callback)
 // #### @user {Object} Properties for the new user.
 // #### @callback {function} Continuation to pass control to when complete
 // Creates a new user with the properties specified by `user`.
 //
 Users.prototype.create = function (user, callback) {
-  this.request('POST', ['users', user.username], user, callback, function (res, result) {
-    callback();
-  });
+  this.request({ method: 'POST', uri: ['users', user.username], body: user }, callback);
 };
 
 //
-// ### function available (username, callback) 
+// ### function available (username, callback)
 // #### @username {string} Username to check availability for.
 // #### @callback {function} Continuation to pass control to when complete
 // Checks the availability of the specified `username`.
 //
 Users.prototype.available = function (username, callback) {
-  this.request('GET', ['users', username, 'available'], callback, function (res, result) {
-    callback(null, result);
-  });
+  this.request({ uri: ['users', username, 'available'] }, callback);
 };
 
 //
@@ -63,10 +62,7 @@ Users.prototype.available = function (username, callback) {
 // Retrieves data for the specified user.
 //
 Users.prototype.view = function (username, callback) {
-
-  this.request('GET', ['users', username], callback, function (res, result) {
-    callback(null, result);
-  });
+  this.request({ uri: ['users', username] }, callback);
 };
 
 //
@@ -76,27 +72,23 @@ Users.prototype.view = function (username, callback) {
 // Confirms the specified `user` by sending the invite code in the `user` specified.
 //
 Users.prototype.confirm = function (user, callback) {
-  this.request('POST', ['users', user.username, 'confirm'], user, callback, function (res, result) {
-    callback(null, result);
-  });
+  this.request({ method: 'POST', uri: ['users', user.username, 'confirm'], body: user }, callback);
 };
 
 //
-// ### function forgot (username, callback) 
+// ### function forgot (username, callback)
 // #### @username {Object} username requesting password reset.
 // #### @params {Object} Object containing shake and new password, if applicable.
 // #### @callback {function} Continuation to pass control to when complete
 // Request an password reset email.
 //
 Users.prototype.forgot = function (username, params, callback) {
-  if (!callback && typeof params == 'function') {
+  if (!callback && typeof params === 'function') {
     callback = params;
     params = {};
   }
 
-  this.request('POST', ['users', username, 'forgot'], params, callback, function (res, result) {
-    return callback(null, result);
-  });
+  this.request({ method: 'POST', uri: ['users', username, 'forgot'], body: params }, callback);
 };
 
 //
@@ -107,9 +99,7 @@ Users.prototype.forgot = function (username, params, callback) {
 // Update user account information.
 //
 Users.prototype.update = function (username, object, callback) {
-  this.request('PUT', ['users', username], object, callback, function (res, result) {
-    callback(null, result);
-  });
+  this.request({ method: 'PUT', uri: ['users', username], body: object }, callback);
 };
 
 //
@@ -121,7 +111,5 @@ Users.prototype.update = function (username, object, callback) {
 // So sad to see you go.
 //
 Users.prototype.destroy = function (username, callback) {
-  this.request('DELETE', ['users', username], callback, function (res, result) {
-    callback(null, result);
-  });
+  this.request({ method: 'DELETE', uri: ['users', username] }, callback);
 };

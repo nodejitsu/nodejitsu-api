@@ -1,20 +1,33 @@
+'use strict';
+
 var parts = ['Apps', 'Users', 'Keys', 'Tokens', 'Snapshots', 'Databases', 'Logs', 'Client'];
 
-parts.forEach(function (k) {
+parts.forEach(function forEach(k) {
   exports[k] = require('./client/' + k.toLowerCase())[k];
-})
+});
 
-exports.createClient = function (options) {
+//
+// ### function createClient(options)
+// #### @options {Object} options for the clients
+// Generates a new API client.
+//
+exports.createClient = function createClient(options) {
   var client = {};
-  parts.forEach(function (k) {
-    client[k.toLowerCase()] = new exports[k](options);
-    client[k.toLowerCase()].on('debug::request',  debug);
-    client[k.toLowerCase()].on('debug::response', debug);
-  });
-  function debug (arguments) {
+
+  parts.forEach(function generate(k) {
+    var endpoint = k.toLowerCase();
+
+    client[endpoint] = new exports[k](options);
+
     if (options.debug) {
-      console.log(arguments);
+      client[endpoint].on('debug::request', debug);
+      client[endpoint].on('debug::response', debug);
     }
+  });
+
+  function debug(args) {
+    console.log(args);
   }
+
   return client;
-}
+};

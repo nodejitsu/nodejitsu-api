@@ -1,3 +1,5 @@
+'use strict';
+
 /*
  * logs.js: Client for the Nodejitsu logs API.
  *
@@ -30,17 +32,15 @@ util.inherits(Logs, Client);
 // It retrieves the specified amount of logs for the application
 //
 Logs.prototype.byApp = function (appName, amount, callback) {
-  var appName = defaultUser.call(this, appName),
-      argv = ['logs'].concat(appName.split('/')),
+  appName = defaultUser.call(this, appName);
+  var argv = ['logs'].concat(appName.split('/')),
       options = {
         from: 'NOW-1DAY',
         until: 'NOW',
         rows: amount
       };
 
-  this.request('POST', argv, options, callback, function (res, result) {
-    callback(null, result);
-  });
+  this.request({ method: 'POST', uri: argv, body: options }, callback);
 };
 
 //
@@ -53,12 +53,10 @@ Logs.prototype.byApp = function (appName, amount, callback) {
 Logs.prototype.byUser = function (username, amount, callback) {
   var options;
 
-
-  if (arguments.length == 2) {
+  if (arguments.length === 2) {
     callback = amount;
     amount = username;
     username = this.options.get('username');
-
   }
 
   if (typeof username === undefined || username === null) {
@@ -71,7 +69,5 @@ Logs.prototype.byUser = function (username, amount, callback) {
     rows: amount
   };
 
-  this.request('POST', ['logs', username], options, callback, function (res, result) {
-    callback(null, result);
-  });
+  this.request({method: 'POST', uri: ['logs', username], body: options }, callback);
 };
