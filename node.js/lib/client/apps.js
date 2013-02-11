@@ -123,12 +123,24 @@ Apps.prototype.destroy = function (appName, callback) {
 //
 // ### function start (appName, callback)
 // #### @appName {string} Name of the application to start
+// #### @cloud {Object|Array} **Optional** Cloud to start this application in.
 // #### @callback {function} Continuation to pass control to when complete
 // Starts the application with `name` for the authenticated user.
 //
-Apps.prototype.start = function (appName, callback) {
+Apps.prototype.start = function (appName, cloud, callback) {
+  if (!callback && typeof cloud === 'function') {
+    callback = cloud;
+    cloud = null;
+  }
+
   appName = defaultUser.call(this, appName);
   var argv = ['apps'].concat(appName.split('/')).concat('start');
+
+  if (cloud) {
+    self.clouds[appName] = !Array.isArray(cloud)
+      ? [cloud]
+      : cloud;
+  }
 
   this.cloud({ method: 'POST', uri: argv, appName: appName }, this.request, callback);
 };
