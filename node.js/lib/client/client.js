@@ -284,6 +284,7 @@ Client.prototype.upload = function (options, callback) {
 var failCodes = {
   400: 'Bad Request',
   401: 'Not Authorized',
+  402: 'Payment Required',
   403: 'Forbidden',
   404: 'Item not found',
   405: 'Method not Allowed',
