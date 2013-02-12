@@ -137,7 +137,7 @@ Apps.prototype.start = function (appName, cloud, callback) {
   var argv = ['apps'].concat(appName.split('/')).concat('start');
 
   if (cloud) {
-    self.clouds[appName] = !Array.isArray(cloud)
+    this.clouds[appName] = !Array.isArray(cloud)
       ? [cloud]
       : cloud;
   }
