@@ -96,14 +96,14 @@ The following API resources are exposes in the module:
   - [snapshots.destroy][snapshots.destroy]
   - [snapshots.activate][snapshots.activate]
 - [users][users] Manage your Nodejitsu account.
-- [users.auth][users.auth]
-- [users.create][users.create]
-- [users.available][users.available]
-- [users.view][users.view]
-- [users.confirm][users.confirm]
-- [users.forgot][users.forgot]
-- [users.update][users.update]
-- [users.destroy][users.destroy]
+  - [users.auth][users.auth]
+  - [users.create][users.create]
+  - [users.available][users.available]
+  - [users.view][users.view]
+  - [users.confirm][users.confirm]
+  - [users.forgot][users.forgot]
+  - [users.update][users.update]
+  - [users.destroy][users.destroy]
 
 [apps]: #clientapps
 [apps.available]: #clientappsavailable

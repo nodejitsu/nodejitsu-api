@@ -8,8 +8,7 @@
  */
 
 var util = require('util'),
-    Client = require('./client').Client,
-    defaultUser = require('./helpers').defaultUser;
+    Client = require('./client').Client;
 
 //
 // ### function Tokens (options)
@@ -35,35 +34,40 @@ Tokens.prototype.list = function (username, callback) {
     username = this.options.get('username');
   }
 
-  this.request({ uri: ['users', username, 'tokens'] }, callback);
+  this.request({ uri: ['users', username, 'tokens'] }, function (err, result) {
+    if (err) return callback(err);
+
+    callback(err, result.apiTokens);
+  });
 };
 
 //
 // ### function create (username, tokenID, callback)
-// #### @token String Properties for the new token.
+// #### @tokenID String Properties for the new token.
 // #### @callback {function} Continuation to pass control to when complete
 // Creates a new token with the properties specified by `tokenID` if provided.
 //
 Tokens.prototype.create = function (username, tokenID, callback) {
-  if(arguments.length === 1) {
+  var length = arguments.length;
+
+  if (length === 1) {
     callback = username;
     tokenID = null;
     username = this.options.get('username');
   }
 
-  if(arguments.length === 2) {
+  if (length === 2) {
     callback = tokenID;
     tokenID = username;
     username = this.options.get('username');
   }
 
-  if(tokenID !== null){
+  if (tokenID !== null) {
     this.request({ method: 'PUT', uri: ['users', username, 'tokens', tokenID] }, callback);
   } else {
     this.request({ method: 'POST', uri: ['users', username, 'tokens'] }, callback);
   }
 };
-
 
 //
 // ### function destroy (token, callback)
@@ -72,7 +76,7 @@ Tokens.prototype.create = function (username, tokenID, callback) {
 // Destroys a token with the id specified by `token`.
 //
 Tokens.prototype.destroy = function (username, tokenID, callback) {
-  if(arguments.length === 2) {
+  if (arguments.length === 2) {
     callback = tokenID;
     tokenID = username;
     username = this.options.get('username');
