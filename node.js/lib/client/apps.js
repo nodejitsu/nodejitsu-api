@@ -221,14 +221,28 @@ Apps.prototype.datacenter = function (appName, cloud, callback) {
   //
   this.clouds[appName] = cloud;
 
-  this.cloud({ method: 'POST', uri: argv, body: cloud, appName: appName }, this.request, function (err, result) {
-    //
-    // Assume that this call invalidates our cached datacenter endpoint, so
-    // remove it, and it will be fetched again on the next call
-    //
-    delete self.clouds[appName];
+  // Ensure the app is started before we try to set the datacenter.
+  this.view(appName, function (err, current) {
+    if (err) throw err;
 
-    if (err) return callback(err);
-    callback(err, result);
+    if (!current.config.cloud) {
+      self.start(appName, executeCloud);
+    }
+    else {
+      executeCloud();
+    }
   });
+
+  function executeCloud() {
+    self.cloud({ method: 'POST', uri: argv, body: cloud, appName: appName }, self.request, function (err, result) {
+      //
+      // Assume that this call invalidates our cached datacenter endpoint, so
+      // remove it, and it will be fetched again on the next call
+      //
+      delete self.clouds[appName];
+
+      if (err) return callback(err);
+      callback(err, result);
+    });
+  }
 };
