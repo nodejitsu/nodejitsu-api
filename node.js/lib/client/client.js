@@ -154,7 +154,7 @@ Client.prototype.cloud = function (options, api, callback) {
 Client.prototype.request = function (options, callback) {
   options = options || {};
 
-  var password = this.options.get('password') || this.options.get('api-token'),
+  var password = this.options.get('password') || this.options.get('apiToken'),
       auth = new Buffer(this.options.get('username') + ':' + password).toString('base64'),
       proxy = this.options.get('proxy'),
       self = this,
