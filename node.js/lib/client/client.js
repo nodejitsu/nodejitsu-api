@@ -168,6 +168,7 @@ Client.prototype.request = function (options, callback) {
       'Content-Type': 'application/json'
     },
     timeout: options.timeout || this.options.get('timeout') || 8 * 60 * 1000,
+    rejectUnauthorized: this.options.get('rejectUnauthorized')
   };
 
   if (options.body) {
