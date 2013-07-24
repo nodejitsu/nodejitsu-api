@@ -8,6 +8,7 @@
  */
 
 var util = require('util'),
+    defaultUser = require('./helpers').defaultUser,
     Client = require('./client').Client;
 
 //
@@ -31,7 +32,8 @@ util.inherits(Databases, Client);
 // Provisions a database for the user
 //
 Databases.prototype.create = function (databaseType, databaseName, callback) {
-  var argv = ['databases', this.options.get('username'), databaseName];
+  databaseName = defaultUser.call(this, databaseName);
+  var argv = [ 'databases' ].concat(databaseName.split('/'));
 
   this.request({ method: 'POST', uri: argv, body: { type: databaseType }}, function (err, result, res) {
     if (err) return callback(err);
@@ -47,7 +49,8 @@ Databases.prototype.create = function (databaseType, databaseName, callback) {
 // Gets the metadata for the specified database
 //
 Databases.prototype.get = function (databaseName, callback) {
-  var argv = ['databases', this.options.get('username'), databaseName];
+  databaseName = defaultUser.call(this, databaseName);
+  var argv = [ 'databases' ].concat(databaseName.split('/'));
 
   this.request({ uri: argv }, function (err, result) {
     if (err) return callback(err);
@@ -82,7 +85,8 @@ Databases.prototype.list = function (username, callback) {
 // Deprovisions specified database
 //
 Databases.prototype.destroy = function (databaseName, callback) {
-  var argv = ['databases', this.options.get('username'), databaseName];
+  databaseName = defaultUser.call(this, databaseName);
+  var argv = [ 'databases' ].concat(databaseName.split('/'));
 
   this.request({ method: 'DELETE', uri: argv }, callback);
 };
