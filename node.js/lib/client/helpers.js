@@ -2,17 +2,17 @@
 
 //
 // ### function defaultUser (appName)
-// #### @appName {String} App name
+// #### @data {String} App name, user/app, or user/database.
 //
 // A helper to prepend a default username.
 // needs 'this' to be able to options.get('username').
 //
-exports.defaultUser = function (appName) {
-  if (appName.search('/') === -1) {
-    appName = this.options.get('username') + '/' + appName;
+exports.defaultUser = function (data) {
+  if (!~data.indexOf('/')) {
+    data = this.options.get('username') + '/' + data;
   }
 
-  return appName;
+  return data;
 };
 
 //
