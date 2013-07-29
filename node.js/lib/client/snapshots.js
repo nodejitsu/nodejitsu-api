@@ -8,8 +8,7 @@
  */
 
 var util = require('util'),
-    Client = require('./client').Client,
-    defaultUser = require('./helpers').defaultUser;
+    Client = require('./client').Client;
 
 //
 // ### function Snapshots (options)
@@ -31,8 +30,8 @@ util.inherits(Snapshots, Client);
 // Lists all applications for the authenticated user
 //
 Snapshots.prototype.list = function (appName, callback) {
-  appName = defaultUser.call(this, appName);
-  var argv = ['apps'].concat(appName.split('/')).concat('snapshots');
+  var appName = this.defaultUser(appName),
+      argv = ['apps'].concat(appName.split('/')).concat('snapshots');
 
   this.request({ uri: argv }, function (err, result) {
     if (err) return callback(err);
@@ -51,8 +50,8 @@ Snapshots.prototype.list = function (appName, callback) {
 // `app.name = name` using the `*.tgz` package data in `filename` file.
 //
 Snapshots.prototype.create = function (appName, snapshotName, filename, callback) {
-  appName = defaultUser.call(this, appName);
-  var argv = ['apps'].concat(appName.split('/')).concat(['snapshots', snapshotName]);
+  var appName = this.defaultUser(appName),
+      argv = ['apps'].concat(appName.split('/')).concat(['snapshots', snapshotName]);
 
   return this.upload({ uri: argv, file: filename }, callback);
 };
@@ -66,8 +65,8 @@ Snapshots.prototype.create = function (appName, snapshotName, filename, callback
 // `snapshot.id === snapshotName`.
 //
 Snapshots.prototype.fetch = function (appName, snapshotName, callback) {
-  appName = defaultUser.call(this, appName);
-  var argv = ['apps'].concat(appName.split('/')).concat(['snapshots', snapshotName + '.tgz']);
+  var appName = this.defaultUser(appName),
+      argv = ['apps'].concat(appName.split('/')).concat(['snapshots', snapshotName + '.tgz']);
 
   callback = callback || function () {};
   return this.request({ uri: argv }, callback);
@@ -82,8 +81,8 @@ Snapshots.prototype.fetch = function (appName, snapshotName, callback) {
 // `snapshot.id === snapshotName`.
 //
 Snapshots.prototype.destroy = function (appName, snapshotName, callback) {
-  appName = defaultUser.call(this, appName);
-  var argv = ['apps'].concat(appName.split('/')).concat(['snapshots', snapshotName]);
+  var appName = this.defaultUser(appName),
+      argv = ['apps'].concat(appName.split('/')).concat(['snapshots', snapshotName]);
 
   this.request({ method: 'DELETE', uri: argv }, callback);
 };
@@ -97,8 +96,8 @@ Snapshots.prototype.destroy = function (appName, snapshotName, callback) {
 // `snapshot.id === snapshotName`.
 //
 Snapshots.prototype.activate = function (appName, snapshotName, callback) {
-  appName = defaultUser.call(this, appName);
-  var argv = ['apps'].concat(appName.split('/')).concat(['snapshots', snapshotName, 'activate']);
+  var appName = this.defaultUser(appName),
+      argv = ['apps'].concat(appName.split('/')).concat(['snapshots', snapshotName, 'activate']);
 
   this.request({ method: 'POST', uri: argv }, callback);
 };

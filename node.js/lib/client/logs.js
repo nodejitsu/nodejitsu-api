@@ -8,8 +8,7 @@
  */
 
 var util = require('util'),
-    Client = require('./client').Client,
-    defaultUser = require('./helpers').defaultUser;
+    Client = require('./client').Client;
 
 //
 // ### function Logs (options)
@@ -32,8 +31,8 @@ util.inherits(Logs, Client);
 // It retrieves the specified amount of logs for the application
 //
 Logs.prototype.byApp = function (appName, amount, callback) {
-  appName = defaultUser.call(this, appName);
-  var argv = ['logs'].concat(appName.split('/')),
+  var appName = this.defaultUser(appName),
+      argv = ['logs'].concat(appName.split('/')),
       options = {
         from: 'NOW-1DAY',
         until: 'NOW',

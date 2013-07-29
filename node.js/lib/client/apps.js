@@ -8,8 +8,7 @@
  */
 
 var util = require('util'),
-    Client = require('./client').Client,
-    defaultUser = require('./helpers').defaultUser;
+    Client = require('./client').Client;
 
 //
 // ### function Apps (options)
@@ -62,7 +61,7 @@ Apps.prototype.list = function (username, callback) {
 // Creates an application with the specified package.json manifest in `app`.
 //
 Apps.prototype.create = function (app, callback) {
-  var appName = defaultUser.call(this, app.name);
+  var appName = this.defaultUser(app.name);
 
   this.request({ method: 'POST', uri: ['apps', appName], body: app }, callback);
 };
@@ -74,8 +73,8 @@ Apps.prototype.create = function (app, callback) {
 // Views the application specified by `name`.
 //
 Apps.prototype.view = function (appName, callback) {
-  appName = defaultUser.call(this, appName);
-  var argv = ['apps'].concat(appName.split('/')),
+  var appName = this.defaultUser(appName),
+      argv = ['apps'].concat(appName.split('/')),
       self = this;
 
   this.request({ uri: argv }, function (err, result) {
@@ -101,8 +100,8 @@ Apps.prototype.view = function (appName, callback) {
 // Updates the application with `name` with the specified attributes in `attrs`
 //
 Apps.prototype.update = function (appName, attrs, callback) {
-  appName = defaultUser.call(this, appName);
-  var argv = ['apps'].concat(appName.split('/'));
+  var appName = this.defaultUser(appName),
+      argv = ['apps'].concat(appName.split('/'));
 
   this.request({ method: 'PUT', uri: argv, body: attrs }, callback);
 };
@@ -114,8 +113,8 @@ Apps.prototype.update = function (appName, attrs, callback) {
 // Destroys the application with `name` for the authenticated user.
 //
 Apps.prototype.destroy = function (appName, callback) {
-  appName = defaultUser.call(this, appName);
-  var argv = ['apps'].concat(appName.split('/'));
+  var appName = this.defaultUser(appName),
+      argv = ['apps'].concat(appName.split('/'));
 
   this.request({ method: 'DELETE', uri: argv, appName: appName }, callback);
 };
@@ -133,8 +132,8 @@ Apps.prototype.start = function (appName, cloud, callback) {
     cloud = null;
   }
 
-  appName = defaultUser.call(this, appName);
-  var argv = ['apps'].concat(appName.split('/')).concat('start');
+  var appName = this.defaultUser(appName),
+      argv = ['apps'].concat(appName.split('/')).concat('start');
 
   if (cloud) {
     this.clouds[appName] = !Array.isArray(cloud)
@@ -152,8 +151,8 @@ Apps.prototype.start = function (appName, cloud, callback) {
 // Starts the application with `name` for the authenticated user.
 //
 Apps.prototype.restart = function (appName, callback) {
-  appName = defaultUser.call(this, appName);
-  var argv = ['apps'].concat(appName.split('/')).concat('restart');
+  var appName = this.defaultUser(appName),
+      argv = ['apps'].concat(appName.split('/')).concat('restart');
 
   this.cloud({ method: 'POST', uri: argv, appName: appName }, this.request, callback);
 };
@@ -165,8 +164,8 @@ Apps.prototype.restart = function (appName, callback) {
 // Stops the application with `name` for the authenticated user.
 //
 Apps.prototype.stop = function (appName, callback) {
-  appName = defaultUser.call(this, appName);
-  var argv = ['apps'].concat(appName.split('/')).concat('stop');
+  var appName = this.defaultUser(appName),
+      argv = ['apps'].concat(appName.split('/')).concat('stop');
 
   this.cloud({ method: 'POST', uri: argv, appName: appName }, this.request, callback);
 };
@@ -179,7 +178,7 @@ Apps.prototype.stop = function (appName, callback) {
 // in the current Nodejitsu environment.
 //
 Apps.prototype.available = function (app, callback) {
-  var appName = defaultUser.call(this, app.name),
+  var appName = this.defaultUser(app.name),
       argv = ['apps'].concat(appName.split('/')).concat('available');
 
   this.request({ method: 'POST', uri: argv, body: app }, callback);
@@ -193,8 +192,8 @@ Apps.prototype.available = function (app, callback) {
 // Runs `app` on `drones` drones.
 //
 Apps.prototype.setDrones = function (appName, drones, callback) {
-  appName = defaultUser.call(this, appName);
-  var argv = ['apps'].concat(appName.split('/')).concat('cloud'),
+  var appName = this.defaultUser(appName),
+      argv = ['apps'].concat(appName.split('/')).concat('cloud'),
       cloud = [{ drones: drones }];
 
   this.cloud({ method: 'POST', uri: argv, body: cloud, appName: appName }, this.request, callback);
@@ -208,8 +207,8 @@ Apps.prototype.setDrones = function (appName, drones, callback) {
 // Deploy the given application in a new datacenter.
 //
 Apps.prototype.datacenter = function (appName, cloud, callback) {
-  appName = defaultUser.call(this, appName);
-  var argv = ['apps'].concat(appName.split('/')).concat('cloud'),
+  var appName = this.defaultUser(appName),
+      argv = ['apps'].concat(appName.split('/')).concat('cloud'),
       self = this;
 
   if (!Array.isArray(cloud)) cloud = [cloud];

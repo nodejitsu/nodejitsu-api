@@ -8,8 +8,7 @@
  */
 
 var util = require('util'),
-    Client = require('./client').Client,
-    defaultUser = require('./helpers').defaultUser;
+    Client = require('./client').Client;
 
 //
 // ### function Keys (options)

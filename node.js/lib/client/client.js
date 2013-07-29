@@ -35,6 +35,22 @@ var Client = exports.Client = function (options) {
 util.inherits(Client, EventEmitter);
 
 //
+// ### function defaultUser (appName)
+// #### @data {String} App name, user/app, or user/database.
+//
+// A helper to prepend a default username.
+// needs 'this' to be able to options.get('username').
+//
+Client.prototype.defaultUser = function (data) {
+  if (!~data.indexOf('/')) {
+    data = this.options.get('username') + '/' + data;
+  }
+
+  return data;
+};
+
+
+//
 // ### function endpoints(callback)
 // #### @callback {function} Continuation to respond to when complete.
 // Retrieves a list of currenlty active datacenters and providers
