@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "request": "2.25.0",
-    "preacher-api": "0.1.4"
+    "preacher-api": "0.1.x"
   },
   "devDependencies": {
     "vows": "0.7.x",
