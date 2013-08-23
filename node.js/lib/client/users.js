@@ -31,7 +31,7 @@ util.inherits(Users, Client);
 Users.prototype.auth = function (callback) {
   this.request({ uri: ['auth'] }, function (err, result) {
     if (err) return callback(err)
-    callback(err, true);
+    callback(err, result);
   });
 };
 
