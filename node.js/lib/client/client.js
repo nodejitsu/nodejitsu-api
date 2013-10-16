@@ -173,6 +173,7 @@ Client.prototype.request = function (options, callback) {
   var password = this.options.get('password') || this.options.get('apiToken'),
       auth = new Buffer(this.options.get('username') + ':' + password).toString('base64'),
       proxy = this.options.get('proxy'),
+      optHeaders,
       self = this,
       opts = {};
 
@@ -197,6 +198,13 @@ Client.prototype.request = function (options, callback) {
   if (options.headers) Object.keys(options.headers).forEach(function each(field) {
     opts.headers[field] = options.headers[field];
   });
+
+  optHeaders = this.options.get('headers');
+  if (optHeaders) {
+    Object.keys(optHeaders).forEach(function each(field) {
+      opts.headers[field] = optHeaders[field];
+    });
+  }
 
   if (proxy) opts.proxy = proxy;
 
