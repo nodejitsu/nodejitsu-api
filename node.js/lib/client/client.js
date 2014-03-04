@@ -232,10 +232,14 @@ Client.prototype.request = function (options, callback) {
       error.statusCode = statusCode;
       error.result = result;
     }
-
-    // Only add the response argument when people ask for it
-    if (callback.length === 3) return callback(error, result, res);
-    callback(error, result);
+    //
+    // If we don't pass a callback here, don't try and do anything fancy
+    //
+    if (callback) {
+      // Only add the response argument when people ask for it
+      if (callback.length === 3) return callback(error, result, res);
+      callback(error, result);
+    }
   });
 };
 
@@ -273,8 +277,11 @@ Client.prototype.upload = function (options, callback) {
     options.body = false;
 
     // Defer all the error handling to the request method
-    var req = self.request(options, callback);
+    var req = self.request(options);
     if (!req) return;
+
+    req.on('error', callback);
+    req.on('response', callback.bind(null, null));
 
     // Notify that we have started the upload procedure and give it a reference
     // to the stat.
