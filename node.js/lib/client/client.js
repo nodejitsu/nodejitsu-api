@@ -280,13 +280,15 @@ Client.prototype.upload = function (options, callback) {
 
     req.on('error', callback);
     req.on('response', function (res) {
+      var statusCode = res.statusCode,
+          error;
+
       //
       // TODO: clean this up. This is an extraneous case that offsets the main
       // use case of the api so we repeat some code here
       //
-      if (failCodes[res.statusCode]) {
-        var statusCode = res.statusCode,
-            error = new Error('Nodejitsu Error (' + statusCode + '): ' + failCodes[statusCode]);
+      if (failCodes[statusCode]) {
+        error = new Error('Nodejitsu Error (' + statusCode + '): ' + failCodes[statusCode]);
 
         error.statusCode = statusCode;
         error.result = '';
