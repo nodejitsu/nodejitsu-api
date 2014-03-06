@@ -285,7 +285,9 @@ Client.prototype.upload = function (options, callback) {
       // use case of the api so we repeat some code here
       //
       if (failCodes[res.statusCode]) {
-        var error = new Error('Nodejitsu Error (' + statusCode + '): ' + failCodes[statusCode]);
+        var statusCode = res.statusCode,
+            error = new Error('Nodejitsu Error (' + statusCode + '): ' + failCodes[statusCode]);
+
         error.statusCode = statusCode;
         error.result = '';
 
