@@ -232,9 +232,7 @@ Client.prototype.request = function (options, callback) {
       error.statusCode = statusCode;
       error.result = result;
     }
-    //
-    // If we don't pass a callback here, don't try and do anything fancy
-    //
+    // Only call this if we pass a callback
     if (callback) {
       // Only add the response argument when people ask for it
       if (callback.length === 3) return callback(error, result, res);
@@ -281,7 +279,30 @@ Client.prototype.upload = function (options, callback) {
     if (!req) return;
 
     req.on('error', callback);
-    req.on('response', callback.bind(null, null));
+    req.on('response', function (res) {
+      //
+      // TODO: clean this up. This is an extraneous case that offsets the main
+      // use case of the api so we repeat some code here
+      //
+      if (failCodes[res.statusCode]) {
+        var error = new Error('Nodejitsu Error (' + statusCode + '): ' + failCodes[statusCode]);
+        error.statusCode = statusCode;
+        error.result = '';
+
+        res.on('data', function (d) {
+          error.result += d;
+        });
+
+        res.on('end', function () {
+          try { error.result = JSON.parse(error.result) }
+          catch (ex) {}
+          callback(error);
+        });
+        return;
+      }
+
+      callback(null, res);
+    });
 
     // Notify that we have started the upload procedure and give it a reference
     // to the stat.
