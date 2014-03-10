@@ -210,35 +210,37 @@ Client.prototype.request = function (options, callback) {
 
   this.emit('debug::request', opts);
 
-  return this._request(opts, function requesting(err, res, body) {
-    if (err) return callback(err);
+  //
+  // When we don't pass a callback just return the request object
+  //
+  return !callback || typeof callback !== 'function'
+    ? this._request(opts)
+    : this._request(opts, function requesting(err, res, body) {
+      if (err) return callback(err);
 
-    var poweredBy = res.headers['x-powered-by'],
-        result, statusCode, error;
+      var poweredBy = res.headers['x-powered-by'],
+          result, statusCode, error;
 
-    try {
-      statusCode = res.statusCode;
-      result = JSON.parse(body);
-    } catch (e) {}
+      try {
+        statusCode = res.statusCode;
+        result = JSON.parse(body);
+      } catch (e) {}
 
-    self.emit('debug::response', { statusCode: statusCode, result: result });
+      self.emit('debug::response', { statusCode: statusCode, result: result });
 
-    if (!self.options.get('ignorePoweredBy') && !poweredBy || !~poweredBy.indexOf('Nodejitsu')) {
-      error = new Error('The Nodejitsu-API requires you to connect the Nodejitsu\'s stack (api.nodejitsu.com)');
-      error.statusCode = 403;
-      error.result = '';
-    } else if (failCodes[statusCode]) {
-      error = new Error('Nodejitsu Error (' + statusCode + '): ' + failCodes[statusCode]);
-      error.statusCode = statusCode;
-      error.result = result;
-    }
-    // Only call this if we pass a callback
-    if (callback) {
+      if (!self.options.get('ignorePoweredBy') && !poweredBy || !~poweredBy.indexOf('Nodejitsu')) {
+        error = new Error('The Nodejitsu-API requires you to connect the Nodejitsu\'s stack (api.nodejitsu.com)');
+        error.statusCode = 403;
+        error.result = '';
+      } else if (failCodes[statusCode]) {
+        error = new Error('Nodejitsu Error (' + statusCode + '): ' + failCodes[statusCode]);
+        error.statusCode = statusCode;
+        error.result = result;
+      }
       // Only add the response argument when people ask for it
       if (callback.length === 3) return callback(error, result, res);
       callback(error, result);
-    }
-  });
+    });
 };
 
 //
