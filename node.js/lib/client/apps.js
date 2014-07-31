@@ -222,7 +222,7 @@ Apps.prototype.datacenter = function (appName, cloud, callback) {
 
   // Ensure the app is started before we try to set the datacenter.
   this.view(appName, function (err, current) {
-    if (err) throw err;
+    if (err) return callback(err);
 
     if (!current.config.cloud) {
       self.start(appName, executeCloud);
