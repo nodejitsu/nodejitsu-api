@@ -56,6 +56,16 @@ Users.prototype.available = function (username, callback) {
 };
 
 //
+// ### function uniqueEmail (email, callback)
+// #### @email {string} Email to check for uniqueness.
+// #### @callback {function} Continuation to pass control to when complete
+// Checks if the supplied email is unique.
+//
+User.prototype.uniqueEmail = function (email, callback) {
+  this.request({ uri: ['users', email, 'unique'] }, callback);
+}
+
+//
 // ### function view (username, callback)
 // #### @callback {function} Continuation to pass control to when complete.
 // Retrieves data for the specified user.
