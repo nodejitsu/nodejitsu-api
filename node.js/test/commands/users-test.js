@@ -19,6 +19,14 @@ vows.describe('users').addBatch(makeApiCall(
       .reply(200, {}, { 'x-powered-by': 'Nodejitsu' })
   }
 )).addBatch(makeApiCall(
+  'users email unregistered@nodejitsu.com not taken',
+  { email: 'unregistered@nodejitsu.com' },
+  function setup () {
+    nock('https://api.mockjitsu.com')
+      .post('/users/email/taken')
+      .reply(200, {}, { 'x-powered-by': 'Nodejitsu' })
+  }
+)).addBatch(makeApiCall(
   'users view abraham',
   function setup () {
     nock('https://api.mockjitsu.com')
