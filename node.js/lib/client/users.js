@@ -56,13 +56,13 @@ Users.prototype.available = function (username, callback) {
 };
 
 //
-// ### function uniqueEmail (email, callback)
+// ### function emailTaken (email, callback)
 // #### @email {string} Email to check for uniqueness.
 // #### @callback {function} Continuation to pass control to when complete
 // Checks if the supplied email is unique.
 //
-Users.prototype.uniqueEmail = function (email, callback) {
-  this.request({ method: 'POST', uri: ['users', 'email'], body: {
+Users.prototype.emailTaken = function (email, callback) {
+  this.request({ method: 'POST', uri: ['users', 'email', 'taken'], body: {
     email: email
   }}, callback);
 }
