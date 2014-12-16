@@ -30,7 +30,7 @@ util.inherits(Users, Client);
 //
 Users.prototype.auth = function (callback) {
   this.request({ uri: ['auth'] }, function (err, result) {
-    if (err) return callback(err)
+    if (err) return callback(err);
     callback(err, result);
   });
 };
@@ -52,7 +52,7 @@ Users.prototype.create = function (user, callback) {
 // Checks the availability of the specified `username`.
 //
 Users.prototype.available = function (username, callback) {
-  this.request({ uri: ['users', username, 'available'] }, callback);
+  this.request({ uri: ['users', encodeURIComponent(username), 'available'] }, callback);
 };
 
 //
@@ -65,7 +65,7 @@ Users.prototype.emailTaken = function (email, callback) {
   this.request({ method: 'POST', uri: ['users', 'email', 'taken'], body: {
     email: email
   }}, callback);
-}
+};
 
 //
 // ### function view (username, callback)
