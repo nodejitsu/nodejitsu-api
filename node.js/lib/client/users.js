@@ -42,7 +42,11 @@ Users.prototype.auth = function (callback) {
 // Creates a new user with the properties specified by `user`.
 //
 Users.prototype.create = function (user, callback) {
-  this.request({ method: 'POST', uri: ['users', user.username], body: user }, callback);
+  this.request({
+    method: 'POST',
+    uri: ['users', encodeURIComponent(user.username)],
+    body: user
+  }, callback);
 };
 
 //
@@ -52,7 +56,9 @@ Users.prototype.create = function (user, callback) {
 // Checks the availability of the specified `username`.
 //
 Users.prototype.available = function (username, callback) {
-  this.request({ uri: ['users', encodeURIComponent(username), 'available'] }, callback);
+  this.request({
+    uri: ['users', encodeURIComponent(username), 'available']
+  }, callback);
 };
 
 //
@@ -73,7 +79,9 @@ Users.prototype.emailTaken = function (email, callback) {
 // Retrieves data for the specified user.
 //
 Users.prototype.view = function (username, callback) {
-  this.request({ uri: ['users', username] }, callback);
+  this.request({
+    uri: ['users', encodeURIComponent(username)]
+  }, callback);
 };
 
 //
@@ -83,7 +91,11 @@ Users.prototype.view = function (username, callback) {
 // Confirms the specified `user` by sending the invite code in the `user` specified.
 //
 Users.prototype.confirm = function (user, callback) {
-  this.request({ method: 'POST', uri: ['users', user.username, 'confirm'], body: user }, callback);
+  this.request({
+    method: 'POST',
+    uri: ['users', encodeURIComponent(user.username), 'confirm'],
+    body: user
+  }, callback);
 };
 
 //
@@ -99,7 +111,11 @@ Users.prototype.forgot = function (username, params, callback) {
     params = {};
   }
 
-  this.request({ method: 'POST', uri: ['users', username, 'forgot'], body: params }, callback);
+  this.request({
+    method: 'POST',
+    uri: ['users', encodeURIComponent(username), 'forgot'],
+    body: params
+  }, callback);
 };
 
 //
@@ -110,7 +126,11 @@ Users.prototype.forgot = function (username, params, callback) {
 // Update user account information.
 //
 Users.prototype.update = function (username, object, callback) {
-  this.request({ method: 'PUT', uri: ['users', username], body: object }, callback);
+  this.request({
+    method: 'PUT',
+    uri: ['users', encodeURIComponent(username)],
+    body: object
+  }, callback);
 };
 
 //
@@ -122,5 +142,8 @@ Users.prototype.update = function (username, object, callback) {
 // So sad to see you go.
 //
 Users.prototype.destroy = function (username, callback) {
-  this.request({ method: 'DELETE', uri: ['users', username] }, callback);
+  this.request({
+    method: 'DELETE',
+    uri: ['users', encodeURIComponent(username)]
+  }, callback);
 };
